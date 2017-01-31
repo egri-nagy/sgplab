@@ -40,3 +40,7 @@ AllDivs := function(S,T)
   Info(SubSemiInfoClass,1, Size(L), " possible divisions");
   return Filtered(L, x->IsRelMorph(x,S,T));
 end;
+
+# invariant:
+# IsSubset(AllRelMorphs(S,T), AllDivs(S,T));
+# true
