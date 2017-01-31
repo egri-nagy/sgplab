@@ -29,14 +29,20 @@ end;
 
 # all divisions
 AllDivs := function(S,T)
-  local partitions, L;
+  local partitions, L, f;
   #partitions of T with size not smaller than size of S
   partitions := Filtered(PartitionsSet([1..Size(T)]), x->Size(x)>=Size(S));
-  #for each such partitions, take combinations of its elements of size |S|
+  #for each such partition, take combinations of its elements of size |S|
   #and produce all permutations of these
-  L := Union(List(partitions,
-                  part -> Concatenation(List(Combinations(part, Size(S)),
-                                             x->PermutationsList(x)))));
+  f := function(part)
+    local comb, result;
+    result := [];
+    for comb in IteratorOfCombinations(part, Size(S)) do
+      Append(result, PermutationsList(comb));
+    od;
+    return result;
+  end;
+  L := Union(List(partitions,f));
   Info(SubSemiInfoClass,1, Size(L), " possible divisions");
   return Filtered(L, x->IsRelMorph(x,S,T));
 end;
