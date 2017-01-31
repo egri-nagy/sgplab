@@ -34,9 +34,9 @@ AllDivs := function(S,T)
   partitions := Filtered(PartitionsSet([1..Size(T)]), x->Size(x)>=Size(S));
   #for each such partitions, take combinations of its elements of size |S|
   #and produce all permutations of these
-  L := Concatenation(List(partitions,
-            part -> Concatenation(List(Combinations(part, Size(S)),
-                                       z->PermutationsList(z)))));
-  Info(SubSemiInfoClass,1, Size(L), " possible relmorphs");
+  L := Union(List(partitions,
+                  part -> Concatenation(List(Combinations(part, Size(S)),
+                                             x->PermutationsList(x)))));
+  Info(SubSemiInfoClass,1, Size(L), " possible divisions");
   return Filtered(L, x->IsRelMorph(x,S,T));
 end;
