@@ -25,3 +25,59 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
                              ElementwiseProduct(theta[p[1]], phi[p[2]], Tact)));
 end;
 
+RelationGraph := function(rel)
+  return Concatenation(List(Keys(rel),
+                            k -> List(rel[k],
+                                      v -> [k,v])));
+end;
+
+# used for getting distinct values from relations (set-valued hashmap values)
+DistinctElts := function(colls)
+  return AsSet(Concatenation(AsSet(colls)));
+end;
+
+# turning around a hashmap
+InvertRelation := function(rel)
+  local m;
+  #putting in all values as keys with empty value set for now
+  m := HashMap(List(DistinctElts(Values(rel)),
+                    x -> [x,[]]));
+  Perform(Keys(rel),
+         function(k)
+           Perform(rel[k],
+                  function(v)
+                    AddSet(m[v], k);
+                  end);
+         end);
+  return m;
+end;
+
+Classify := function(elts, f)
+  local e, #an elemenet from elts
+        d, #data constructed from e, f(e)
+        m; #hashmap for the final result
+  m := HashMap();
+  for e in elts do
+    d := f(e);
+    if d in m then
+      Add(m[d], e);
+    else
+      m[d] := [e];
+    fi;
+  od;
+  return m;
+end;
+
+
+# computes the kernel of the relational morphism
+MorphismKernel := function(theta, phi)
+local ys, yts, ts, YtoX, TtoS;
+  ys := DistinctElts(Values(theta));
+  YtoX := InvertRelation(theta);
+  ts := DistinctElts(Values(phi));
+  TtoS := InvertRelation(phi);
+  yts := Cartesian(ys,ts);
+  # now classify these yt pairs based on what the corresponding s' do
+  return List(yts, p -> List(TtoS[p[2]],
+                             x -> [p[1], x, p[2] ])); #no identification yet
+ end;

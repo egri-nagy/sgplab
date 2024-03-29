@@ -23,3 +23,7 @@ ex2phi := HashMap([[Transformation([1,2]), [Transformation([1,2])]],
                    [Transformation([2,1]), [Transformation([1,2])]],
                    [Transformation([2,2]), [Transformation([2,2])]],
                    [Transformation([1,1]), [Transformation([1,1])]]]);
+
+# T2 to itself, isomorphism
+ex3theta := HashMap(List([1,2], x-> [x,[x]]));
+ex3phi := HashMap(List(FullTransformationSemigroup(2), s-> [s,[s]]));
