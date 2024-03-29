@@ -1,4 +1,4 @@
-# brute-forcing morphic relations
+# brute-forcing morphic relations - this is the older attempt, mostly multiplication table based - OBSOLETE
 
 # cross-multiplication of sets A and B using multiplication table M
 SetProd := function(A,B,M)
