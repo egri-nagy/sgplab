@@ -3,6 +3,11 @@
 # working on the covering Lemma algorithm
 
 ## HashMap functions ##################
+# used for getting distinct values from relations (set-valued hashmap values)
+DistinctElts := function(colls)
+  return AsSet(Concatenation(AsSet(colls)));
+end;
+
 # turning around a hashmap
 InvertHashMap := function(rel)
   local m;
@@ -72,10 +77,6 @@ RelationGraph := function(rel)
                                       v -> [k,v])));
 end;
 
-# used for getting distinct values from relations (set-valued hashmap values)
-DistinctElts := function(colls)
-  return AsSet(Concatenation(AsSet(colls)));
-end;
 
 
 # computes the kernel of the relational morphism
@@ -131,6 +132,12 @@ ArrowLabel := function(arrow,n)
   return List([1..n], k -> wi(OnPoints(i,t))( OnPoints(wiinv(i)(k),s) ));
 end;
 
+Arrow2Transformation := function(y,s,t, n)
+  return Transformation
+             (List([1..n],
+                   k -> wi(OnPoints(y,t))(OnPoints(wiinv(y)(k),s))));
+end;
+
 ## Covering Lemma
 Psi := function(theta)
   local m, x, y;
@@ -143,6 +150,18 @@ Psi := function(theta)
   return m;
 end;
 
-Mu := function(theta, phi)
-  return;
+Mu := function(theta, phi,n)
+  local m, t, y, s, cs, deps;
+  m := HashMap(List(Keys(phi), k -> [k,[]]));
+  for s in Keys(phi) do
+    for t in phi[s] do
+      deps := [];
+      for y in DistinctElts(Values(theta)) do
+        Add(deps, [[y], Arrow2Transformation(y,s,t,n-1)]);
+      od;#y
+      cs := Cascade([n, n-1],Concatenation([[[], t]], deps));
+      AddSet(m[s],cs);
+    od;#t
+  od;#s
+  return m;
 end;

@@ -67,6 +67,6 @@ end;
 
 ex4phi := Tnphi(3);
 
-Print(IsRelationalMorphism(ex4theta, ex4phi, OnPoints, OnPoints));
-
+#Print(IsRelationalMorphism(ex4theta, ex4phi, OnPoints, OnPoints));
+Print(IsRelationalMorphism(Psi(ex4theta), Mu(ex4theta, ex4phi,3),OnPoints, OnCoordinates));
 
