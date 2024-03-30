@@ -20,10 +20,22 @@ end;
 # how to define a relational morphism? from (X,S) to (Y,T)?
 # theta, phi: hashmaps - they have the sources, assumed to be complete
 IsRelationalMorphism := function(theta, phi, Sact, Tact)
-  return ForAll(EnumeratorOfCartesianProduct(Keys(theta), Keys(phi)),
-                p -> IsSubset(theta[Sact(p[1],p[2])],
-                             ElementwiseProduct(theta[p[1]], phi[p[2]], Tact)));
+  local x,s,
+        inS, inT; #where is the action computed
+  for x in Keys(theta) do
+    for s in Keys(phi) do
+      inS := theta[Sact(x,s)];
+      inT := ElementwiseProduct(theta[x], phi[s], Tact);
+      if not (IsSubset(inS, inT)) then
+        Print("Checking ", x, "*", s, "\n"); #TODO: use Info once in SgpDec
+        Print(inT, " is not a subset of ", inS, "\n");
+        return false;
+      fi;
+    od;
+  od;
+  return true;
 end;
+
 
 RelationGraph := function(rel)
   return Concatenation(List(Keys(rel),
