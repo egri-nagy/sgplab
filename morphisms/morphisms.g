@@ -78,13 +78,20 @@ end;
 
 # computes the kernel of the relational morphism
 MorphismKernel := function(theta, phi)
-local ys, yts, ts, YtoX, TtoS;
+local ys, yts, ts, YtoX, TtoS, triples, identify;
   ys := DistinctElts(Values(theta));
   YtoX := InvertRelation(theta);
   ts := DistinctElts(Values(phi));
   TtoS := InvertRelation(phi);
   yts := Cartesian(ys,ts);
-  # now classify these yt pairs based on what the corresponding s' do
-  return List(yts, p -> List(TtoS[p[2]],
-                             x -> [p[1], x, p[2] ])); #no identification yet
+  triples := List(yts, p -> List(TtoS[p[2]],
+                                 x -> [p[1], x, p[2] ])); #no identification yet
+  identify := function(arrows)
+    local m;
+    m := Classify(arrows,
+                  arrow -> List(AsSet(YtoX[arrow[1]]),
+                                      x-> OnPoints(x, arrow[2])));
+    return List(Keys(m), k -> First(m[k]));
+  end;
+  return Concatenation(List(triples, identify));
  end;
