@@ -2,6 +2,42 @@
 # using hash-maps for representing relations
 # working on the covering Lemma algorithm
 
+## HashMap functions ##################
+# turning around a hashmap
+InvertHashMap := function(rel)
+  local m;
+  #putting in all values as keys with empty value set for now
+  m := HashMap(List(DistinctElts(Values(rel)),
+                    x -> [x,[]]));
+  Perform(Keys(rel),
+         function(k)
+           Perform(rel[k], #we put all related elements into the mutable lists
+                  function(v)
+                    AddSet(m[v], k);
+                  end);
+         end);
+  return m;
+end;
+
+# classifying a collection based on the output of a function
+# the output of the function is the key and value is the collection of elts
+# producing that value
+Classify := function(elts, f)
+  local e, #an elemenet from elts
+        d, #data constructed from e, f(e)
+        m; #hashmap for the final result
+  m := HashMap();
+  for e in elts do
+    d := f(e);
+    if d in m then
+      Add(m[d], e);
+    else
+      m[d] := [e];
+    fi;
+  od;
+  return m;
+end;
+
 # to apply a binary operation for all ordered pairs for set A and B
 # meant to be used in relational morphisms
 ElementwiseProduct := function(A, B, binop)
@@ -41,57 +77,23 @@ DistinctElts := function(colls)
   return AsSet(Concatenation(AsSet(colls)));
 end;
 
-# turning around a hashmap
-InvertRelation := function(rel)
-  local m;
-  #putting in all values as keys with empty value set for now
-  m := HashMap(List(DistinctElts(Values(rel)),
-                    x -> [x,[]]));
-  Perform(Keys(rel),
-         function(k)
-           Perform(rel[k], #we put all related elements into the mutable lists
-                  function(v)
-                    AddSet(m[v], k);
-                  end);
-         end);
-  return m;
-end;
-
-# classifying a collection based on the output of a function
-# the output of the function is the key and value is the collection of elts
-# producing that value
-Classify := function(elts, f)
-  local e, #an elemenet from elts
-        d, #data constructed from e, f(e)
-        m; #hashmap for the final result
-  m := HashMap();
-  for e in elts do
-    d := f(e);
-    if d in m then
-      Add(m[d], e);
-    else
-      m[d] := [e];
-    fi;
-  od;
-  return m;
-end;
 
 # computes the kernel of the relational morphism
-MorphismKernel := function(theta, phi)
+MorphismKernel := function(theta, phi, Sact)
 local ys, yts, ts, YtoX, TtoS, triples, identify;
   ys := DistinctElts(Values(theta));
-  YtoX := InvertRelation(theta);
+  YtoX := InvertHashMap(theta);
   ts := DistinctElts(Values(phi));
-  TtoS := InvertRelation(phi);
+  TtoS := InvertHashMap(phi);
   yts := Cartesian(ys,ts);
   triples := List(yts, p -> List(TtoS[p[2]],
                                  x -> [p[1], x, p[2] ])); #no identification yet
-  identify := function(arrows)
+  identify := function(arrows) #TODO check this
     local m;
     m := Classify(arrows,
                   arrow -> List(AsSet(YtoX[arrow[1]]),
-                                      x-> OnPoints(x, arrow[2])));
-    return List(Keys(m), k -> First(m[k]));
+                                      x-> Sact(x, arrow[2])));
+    return List(Keys(m), k -> First(m[k])); #just get the first in the group
   end;
   return Concatenation(List(triples, identify));
  end;
