@@ -4,8 +4,10 @@
 
 ## HashMap functions ##################
 # used for getting distinct values from relations (set-valued hashmap values)
-DistinctElts := function(colls)
-  return AsSet(Concatenation(AsSet(colls)));
+# for now we represent morphisms completely, not by generators
+
+DistinctElts := function(coll)
+  return AsSet(Concatenation(AsSet(coll)));
 end;
 
 # turning around a hashmap
@@ -50,6 +52,15 @@ ElementwiseProduct := function(A, B, binop)
                     p -> binop(p[1],p[2])));
 end;
 
+# the graph of a relation, i.e. all related pairs
+HashMapGraph := function(rel)
+  return Concatenation(List(Keys(rel),
+                            k -> List(rel[k],
+                                      v -> [k,v])));
+end;
+
+
+## RELATIONAL MORPHISMS ##############################################
 # how to define a relational morphism? from (X,S) to (Y,T)?
 # theta, phi: hashmaps - they have the sources, assumed to be complete
 # using loops so we can provide details when the morphism fails
@@ -69,15 +80,6 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
   od;
   return true;
 end;
-
-# the graph of a relation, i.e. all related pairs
-RelationGraph := function(rel)
-  return Concatenation(List(Keys(rel),
-                            k -> List(rel[k],
-                                      v -> [k,v])));
-end;
-
-
 
 # computes the kernel of the relational morphism
 MorphismKernel := function(theta, phi, Sact)
@@ -122,14 +124,6 @@ wiinv := function(i)
       return k+1;
     fi;
   end;
-end;
-
-ArrowLabel := function(arrow,n)
-  local i,s,t;
-  i := arrow[1];
-  s := arrow[2];
-  t := arrow[3];
-  return List([1..n], k -> wi(OnPoints(i,t))( OnPoints(wiinv(i)(k),s) ));
 end;
 
 Arrow2Transformation := function(y,s,t, n)
