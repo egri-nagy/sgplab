@@ -97,3 +97,52 @@ local ys, yts, ts, YtoX, TtoS, triples, identify;
   end;
   return Concatenation(List(triples, identify));
  end;
+
+## labelling ##############################
+# n degree, i is the hole
+wi := function(i)
+  return function(k)
+    if k < i then
+      return k;
+    elif k > i then
+      return k-1;
+    else
+      Error("There is no hole!");
+    fi;
+  end;
+end;
+
+# n degree, i is the hole, the inverse
+wiinv := function(i)
+  return function(k)
+    if k < i then
+      return k;
+    else
+      return k+1;
+    fi;
+  end;
+end;
+
+ArrowLabel := function(arrow,n)
+  local i,s,t;
+  i := arrow[1];
+  s := arrow[2];
+  t := arrow[3];
+  return List([1..n], k -> wi(OnPoints(i,t))( OnPoints(wiinv(i)(k),s) ));
+end;
+
+## Covering Lemma
+Psi := function(theta)
+  local m, x, y;
+  m := HashMap(List(Keys(theta), k -> [k,[]]));
+  for x in Keys(theta) do
+    for y in theta[x] do
+      AddSet(m[x], [y,wi(y)(x)]);
+    od;
+  od;
+  return m;
+end;
+
+Mu := function(theta, phi)
+  return;
+end;
