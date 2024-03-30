@@ -70,3 +70,19 @@ ex4phi := Tnphi(3);
 #Print(IsRelationalMorphism(ex4theta, ex4phi, OnPoints, OnPoints));
 Print(IsRelationalMorphism(Psi(ex4theta), Mu(ex4theta, ex4phi,3),OnPoints, OnCoordinates));
 
+Print(IsRelationalMorphism(InvertHashMap(Psi(ex4theta)),
+                           InvertHashMap(Mu(ex4theta, ex4phi,3)),
+                           OnCoordinates,
+                           OnPoints),"\n");
+
+ex5theta := Tntheta(5);
+ex5phi := Tnphi(5);
+Print(IsRelationalMorphism(Psi(ex5theta),
+                           Mu(ex5theta, ex5phi,5),
+                           OnPoints,
+                           OnCoordinates));
+
+Print(IsRelationalMorphism(InvertHashMap(Psi(ex5theta)),
+                           InvertHashMap(Mu(ex5theta, ex5phi,5)),
+                           OnCoordinates,
+                           OnPoints));
