@@ -1,14 +1,6 @@
 # general functions for (relational) morphisms
-# aims to be more flexible by using hash-maps
-
-# checking f:S->T homomorphism; Sop, Top are binary operations
-# T is not needed as elements in T will be determined by f
-IsHomomorphism := function(S, Sop, Top, f)
-  return ForAll(EnumeratorOfCartesianProduct(S,S),
-                s -> f(Sop(s[1], s[2])) #mult in S, go to T by f
-                =
-                Top(f(s[1]),f(s[2]))); #take elements to T, mult there
-end;
+# using hash-maps for representing relations
+# working on the covering Lemma algorithm
 
 # to apply a binary operation for all ordered pairs for set A and B
 # meant to be used in relational morphisms
@@ -19,6 +11,7 @@ end;
 
 # how to define a relational morphism? from (X,S) to (Y,T)?
 # theta, phi: hashmaps - they have the sources, assumed to be complete
+# using loops so we can provide details when the morphism fails
 IsRelationalMorphism := function(theta, phi, Sact, Tact)
   local x,s,
         inS, inT; #where is the action computed
@@ -36,7 +29,7 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
   return true;
 end;
 
-
+# the graph of a relation, i.e. all related pairs
 RelationGraph := function(rel)
   return Concatenation(List(Keys(rel),
                             k -> List(rel[k],
@@ -56,7 +49,7 @@ InvertRelation := function(rel)
                     x -> [x,[]]));
   Perform(Keys(rel),
          function(k)
-           Perform(rel[k],
+           Perform(rel[k], #we put all related elements into the mutable lists
                   function(v)
                     AddSet(m[v], k);
                   end);
@@ -64,6 +57,9 @@ InvertRelation := function(rel)
   return m;
 end;
 
+# classifying a collection based on the output of a function
+# the output of the function is the key and value is the collection of elts
+# producing that value
 Classify := function(elts, f)
   local e, #an elemenet from elts
         d, #data constructed from e, f(e)
@@ -79,7 +75,6 @@ Classify := function(elts, f)
   od;
   return m;
 end;
-
 
 # computes the kernel of the relational morphism
 MorphismKernel := function(theta, phi)
