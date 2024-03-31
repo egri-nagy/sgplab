@@ -223,4 +223,10 @@ TestEmulation := function(S)
   Print("Emulation works? ",
         IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
         "\n");
+  Print("Reverse works? ",
+        IsRelationalMorphism(InvertHashMap(psi),
+                             InvertHashMap(mu),
+                             OnCoordinates,
+                             OnPoints),
+        "\n");
 end;
