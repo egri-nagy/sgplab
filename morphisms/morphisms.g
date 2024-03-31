@@ -107,8 +107,9 @@ local ys, yts, ts, YtoX, TtoS, triples, identify;
  end;
 
 ## labelling ##############################
+# gives a function that maps n points to n-1 by skipping i,
 # n degree, i is the hole
-wi := function(i)
+w := function(i)
   return function(k)
     if k < i then
       return k;
@@ -121,7 +122,7 @@ wi := function(i)
 end;
 
 # n degree, i is the hole, the inverse
-wiinv := function(i)
+winv := function(i)
   return function(k)
     if k < i then
       return k;
@@ -134,7 +135,7 @@ end;
 Arrow2Transformation := function(y,s,t, n)
   return Transformation
              (List([1..n],
-                   k -> wi(OnPoints(y,t))(OnPoints(wiinv(y)(k),s))));
+                   k -> w(OnPoints(y,t))(OnPoints(winv(y)(k),s))));
 end;
 
 ## Covering Lemma
@@ -143,7 +144,7 @@ Psi := function(theta)
   psi := EmptyClone(theta);
   for x in Keys(theta) do
     for y in theta[x] do
-      AddSet(psi[x], [y,wi(y)(x)]);
+      AddSet(psi[x], [y,w(y)(x)]);
     od;
   od;
   return psi;
