@@ -51,41 +51,9 @@ fi;
 
 ### FULL TRANSFORMATION SEMIGROUPS #######################
 # T3 to T2 Zeiger encoding
-# deciding whether a transformation is actually a permutation
-IsPermutation := function(t)
-  return DegreeOfTransformation(t)
-         =
-         Size(AsSet(ImageListOfTransformation(t)));
-end;
 
-# creates a relation on states for the full transformation semigroup, Zeiger encoding?
-theta4n := function(n)
-  return HashMap(List([1..n],
-                      x -> [x, Difference([1..n],[x])]));
-end;
-
-
-
-# if it is a permutation, then leave, otherwise to a set of constant maps to points
-# not in the image
-phi4S := function(S)
-  local f,n;
-  n := DegreeOfTransformationSemigroup(S);
-  f := function(s)
-    if IsPermutation(s) then
-      return [s];
-    else
-      # warning: giving n to ImageListOfTransformation is crucial here!
-      # otherwise, we may add constant maps for the ignored highest fixed point(s)
-      return List(Difference([1..n],AsSet(ImageListOfTransformation(s,n))),
-                  x -> ConstantTransformation(n,x));
-    fi;
-  end;
-  return HashMap(List(S, s -> [s, f(s)]));
-end;
-
-ex4theta := theta4n(3);
-ex4phi := phi4S(FullTransformationSemigroup(3));
+ex4theta := ThetaForDegree(3);
+ex4phi := PhiForTransformationSemigroup(FullTransformationSemigroup(3));
 
 #is it a relational morphism
 Print(IsRelationalMorphism(ex4theta, ex4phi, OnPoints, OnPoints));
@@ -103,8 +71,8 @@ Print(IsRelationalMorphism(InvertHashMap(Psi(ex4theta)),
                            OnPoints),"\n");
 
 
-ex5theta := theta4n(5);
-ex5phi := phi4S(FullTransformationSemigroup(5));
+ex5theta := ThetaForDegree(5);
+ex5phi := PhiForTransformationSemigroup(FullTransformationSemigroup(5));
 Print(IsRelationalMorphism(Psi(ex5theta),
                            Mu(ex5theta, ex5phi,5),
                            OnPoints,
@@ -117,4 +85,4 @@ Print(IsRelationalMorphism(InvertHashMap(Psi(ex5theta)),
 
 
 S := RandomSemigroup(IsTransformationSemigroup, 3,5);
-Print(IsRelationalMorphism(Psi(theta4n(5)), Mu(theta4n(5),phi4S(S),5), OnPoints, OnCoordinates));
+Print(IsRelationalMorphism(Psi(ThetaForDegree(5)), Mu(ThetaForDegree(5),PhiForTransformationSemigroup(S),5), OnPoints, OnCoordinates));

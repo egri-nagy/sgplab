@@ -106,7 +106,47 @@ local ys, yts, ts, YtoX, TtoS, triples, identify;
   return Concatenation(List(triples, identify));
  end;
 
-## labelling ##############################
+### CREATING A SURJECTIVE MORPHISM, constructing theta and phi
+# states: subsets of the state set missing one point
+# transformations: permutations or constant maps
+
+# deciding whether a transformation is actually a permutation
+# note: IsPerm is about the ype of the object
+IsPermutation := function(t)
+  return DegreeOfTransformation(t)
+         =
+         Size(AsSet(ImageListOfTransformation(t)));
+end;
+
+# creates a relation on states for the full transformation semigroup
+# a state goes to a set of all states except itself
+ThetaForDegree := function(n) #we only need the number of states, the degree
+  return HashMap(List([1..n],
+                      x -> [x, Difference([1..n],[x])]));
+end;
+
+# if it is a permutation, then leave, otherwise to a set of constant maps to points
+# not in the image
+PhiForTransformationSemigroup := function(S)
+  local f,n;
+  n := DegreeOfTransformationSemigroup(S);
+  f := function(s)
+    if IsPermutation(s) then
+      return [s];
+    else
+      # warning: giving n to ImageListOfTransformation is crucial here!
+      # otherwise, we may add constant maps for the ignored highest fixed point(s)
+      return List(Difference([1..n],
+                             AsSet(ImageListOfTransformation(s,n))),
+                  x -> ConstantTransformation(n,x));
+    fi;
+  end;
+  return HashMap(List(S, s -> [s, f(s)]));
+end;
+
+### BUILDING THE EMULATION constructing psi and mu ##############################
+
+# LABELLING
 # gives a function that maps n points to n-1 by skipping i,
 # n degree, i is the hole
 w := function(i)
@@ -132,11 +172,12 @@ winv := function(i)
   end;
 end;
 
-Arrow2Transformation := function(y,s,t, n)
+# making a transformation from an arrow in the kernel
+Arrow2Transformation := function(y,s,t,n)
   return Transformation
-             (List([1..n],
+             (List([1..n], #should this be n-1?, nope it doesn't work that way
                    k -> w(OnPoints(y,t))(OnPoints(winv(y)(k),s))));
-end;
+end; #we take a point k
 
 ## Covering Lemma
 Psi := function(theta)
@@ -151,17 +192,35 @@ Psi := function(theta)
 end;
 
 Mu := function(theta, phi,n)
-  local mu, t, y, s, cs, deps;
+  local mu, t, y, s, cs, deps, nt;
   mu := EmptyClone(phi);
   for s in Keys(phi) do
     for t in phi[s] do
       deps := [];
       for y in DistinctElts(Values(theta)) do
-        Add(deps, [[y], Arrow2Transformation(y,s,t,n-1)]);
+        nt := Arrow2Transformation(y,s,t,n-1);
+        if not IsOne(nt) then
+          Add(deps, [[y], nt]);
+        fi;
       od;#y
       cs := Cascade([n, n-1],Concatenation([[[], t]], deps));
       AddSet(mu[s],cs);
     od;#t
   od;#s
   return mu;
+end;
+
+TestEmulation := function(S)
+  local theta, phi, psi, mu, n;
+  n := DegreeOfTransformationSemigroup(S);
+  theta := ThetaForDegree(n);
+  phi := PhiForTransformationSemigroup(S);
+  Print("Surjective morphism works? ",
+        IsRelationalMorphism(theta, phi, OnPoints, OnPoints),
+        "\n");
+  psi := Psi(theta);
+  mu := Mu(theta, phi, n);
+  Print("Emulation works? ",
+        IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
+        "\n");
 end;
