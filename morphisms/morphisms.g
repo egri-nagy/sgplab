@@ -59,7 +59,12 @@ HashMapGraph := function(rel)
                                       v -> [k,v])));
 end;
 
+# creates a new set-valued hashmap using the same keys but with empty value sets
+EmptyClone := function(hashmap)
+  return HashMap(List(Keys(hashmap),
+                      key -> [key, []]));
 
+end;
 ## RELATIONAL MORPHISMS ##############################################
 # how to define a relational morphism? from (X,S) to (Y,T)?
 # theta, phi: hashmaps - they have the sources, assumed to be complete
@@ -134,19 +139,19 @@ end;
 
 ## Covering Lemma
 Psi := function(theta)
-  local m, x, y;
-  m := HashMap(List(Keys(theta), k -> [k,[]]));
+  local psi, x, y;
+  psi := EmptyClone(theta);
   for x in Keys(theta) do
     for y in theta[x] do
-      AddSet(m[x], [y,wi(y)(x)]);
+      AddSet(psi[x], [y,wi(y)(x)]);
     od;
   od;
-  return m;
+  return psi;
 end;
 
 Mu := function(theta, phi,n)
-  local m, t, y, s, cs, deps;
-  m := HashMap(List(Keys(phi), k -> [k,[]]));
+  local mu, t, y, s, cs, deps;
+  mu := EmptyClone(phi);
   for s in Keys(phi) do
     for t in phi[s] do
       deps := [];
@@ -154,8 +159,8 @@ Mu := function(theta, phi,n)
         Add(deps, [[y], Arrow2Transformation(y,s,t,n-1)]);
       od;#y
       cs := Cascade([n, n-1],Concatenation([[[], t]], deps));
-      AddSet(m[s],cs);
+      AddSet(mu[s],cs);
     od;#t
   od;#s
-  return m;
+  return mu;
 end;
