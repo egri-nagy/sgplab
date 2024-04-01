@@ -86,24 +86,31 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
   return true;
 end;
 
+# identifying arrows with the same action
+Identify := function(arrows, YtoX, Sact)
+  local m;
+  m := Classify(arrows,
+                arrow -> List(AsSet(YtoX[arrow[1]]),
+                              x-> Sact(x, arrow[2])));
+  return List(Keys(m), k -> First(m[k])); #just get the first in the group
+end;
+
 # computes the kernel of the relational morphism
 MorphismKernel := function(theta, phi, Sact)
-local ys, yts, ts, YtoX, TtoS, triples, identify;
+local ys, yts, ts, YtoX, TtoS, triples, identified;
   ys := DistinctElts(Values(theta));
   YtoX := InvertHashMap(theta);
   ts := DistinctElts(Values(phi));
   TtoS := InvertHashMap(phi);
   yts := Cartesian(ys,ts);
+  # these triples will be the arrow labels, for all (y,t) pairs we put
+  # an s in between it is a preimage of y
   triples := List(yts, p -> List(TtoS[p[2]],
-                                 x -> [p[1], x, p[2] ])); #no identification yet
-  identify := function(arrows) #TODO check this
-    local m;
-    m := Classify(arrows,
-                  arrow -> List(AsSet(YtoX[arrow[1]]),
-                                      x-> Sact(x, arrow[2])));
-    return List(Keys(m), k -> First(m[k])); #just get the first in the group
-  end;
-  return Concatenation(List(triples, identify));
+                                 s -> [p[1], s, p[2] ])); #no identification yet
+  Print(Size(Concatenation(triples)), " triples ");
+  identified := Concatenation(List(triples,
+                                   arrows -> Identify(arrows, YtoX, Sact)));
+  return identified;
  end;
 
 ### CREATING A SURJECTIVE MORPHISM, constructing theta and phi
