@@ -26,8 +26,23 @@ InvertHashMap := function(rel)
   return m;
 end;
 
+# it is injective if the inverse has singletons, i.e. the preimages are singletons
 IsInjectiveHashMap := function(rel)
   return ForAll(Values(InvertHashMap(rel)), coll -> Size(coll) = 1);
+end;
+
+#doing it a bit more efficiently, to see if there is any overlap between the image
+# sets we have seen so far
+IsInjectiveHashMap2 := function(rel)
+  local coll,imgs;
+  coll := [];
+  for imgs in Values(rel) do
+    if not IsEmpty(Intersection(coll,imgs)) then
+      return false; #not injective
+    fi;
+    coll := Union(coll, imgs); #collect all the elements so far
+  od;
+  return true; #there was no overlap, so it is injective
 end;
 
 # classifying a collection based on the output of a function
