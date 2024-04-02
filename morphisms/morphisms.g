@@ -26,6 +26,10 @@ InvertHashMap := function(rel)
   return m;
 end;
 
+IsInjectiveHashMap := function(rel)
+  return ForAll(Values(InvertHashMap(rel)), coll -> Size(coll) = 1);
+end;
+
 # classifying a collection based on the output of a function
 # the output of the function is the key and value is the collection of elts
 # producing that value
@@ -210,7 +214,10 @@ Mu := function(theta, phi,n)
           Add(deps, [[y], nt]);
         fi;
       od;#y
+      #Print(Size(deps)," "); # is this to big?
+      #if not IsDuplicateFreeList(deps) then Print("*"); fi;
       cs := Cascade([n, n-1],Concatenation([[[], t]], deps));
+      #if cs in mu[s] then Print("#");fi; #never seem to happen 
       AddSet(mu[s],cs);
     od;#t
   od;#s
