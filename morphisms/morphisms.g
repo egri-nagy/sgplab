@@ -139,7 +139,7 @@ local ys, yts, ts, YtoX, TtoS, triples, identified;
 str := function(object) local s; s := String(object); RemoveCharacters(s," "); return s;end;
 
 DotMorphismKernel := function(objects, arrows, Sact, Tact)
-  local gens, dot, i, o2n, y,s,t, y2xypairs, src, trg, edge, edges2labels, a, label;
+  local gens, dot, i, o2n, y,s,t, y2xypairs, src, trg, edge, edges2labels, a, label, labels;
 
   dot:="";
   Append(dot, "//dot\ndigraph morphismkernel{\n");
@@ -161,16 +161,23 @@ DotMorphismKernel := function(objects, arrows, Sact, Tact)
     for src in y2xypairs[y] do
       trg := [Sact(src[1], s), Tact(src[2], t)];
       edge := Concatenation(o2n[src],"->",o2n[trg]);
-      label := Concatenation(str(ImageListOfTransformation(s)), ",", str(ImageListOfTransformation(t)));
-      if IsBound(edges2labels[edge]) then
-        Add(edges2labels[edge], label);
-      else
-        edges2labels[edge] := [label];
+      if src <> trg then
+        label := Concatenation(str(ImageListOfTransformation(s)), ",", str(ImageListOfTransformation(t)));
+        if IsBound(edges2labels[edge]) then
+          Add(edges2labels[edge], label);
+        else
+          edges2labels[edge] := [label];
+        fi;
       fi;
     od;
   od;
   for edge in Keys(edges2labels) do
-    Append(dot, JoinStringsWithSeparator([edge, "[label=\"", JoinStringsWithSeparator(edges2labels[edge],"|"), "\"]\n"],""));
+    labels := edges2labels[edge];
+    Append(dot, JoinStringsWithSeparator([edge, "[label=\"",
+                                          str(labels[1]), #the first one goes into label
+                                          "\", tooltip=\"",
+                                          JoinStringsWithSeparator(labels{[2..Size(labels)]},"|"),
+                                          "\"]\n"],""));
   od;
   Append(dot,"}\n");
   return dot;
