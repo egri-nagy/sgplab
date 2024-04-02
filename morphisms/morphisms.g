@@ -114,8 +114,12 @@ Identify := function(arrows, YtoX, Sact)
   return List(Keys(m), k -> First(m[k])); #just get the first in the group
 end;
 
+MorphismKernelObjects := function(theta) #TODO this is just a synonym
+  return HashMapGraph(theta);
+end;
+
 # computes the kernel of the relational morphism
-MorphismKernel := function(theta, phi, Sact)
+MorphismKernelArrows := function(theta, phi, Sact)
 local ys, yts, ts, YtoX, TtoS, triples, identified;
   ys := DistinctElts(Values(theta));
   YtoX := InvertHashMap(theta);
@@ -131,6 +135,46 @@ local ys, yts, ts, YtoX, TtoS, triples, identified;
                                    arrows -> Identify(arrows, YtoX, Sact)));
   return identified;
  end;
+
+str := function(object) local s; s := String(object); RemoveCharacters(s," "); return s;end;
+
+DotMorphismKernel := function(objects, arrows, Sact, Tact)
+  local gens, dot, i, o2n, y,s,t, y2xypairs, src, trg, edge, edges2labels, a, label;
+
+  dot:="";
+  Append(dot, "//dot\ndigraph morphismkernel{\n");
+  #Append(str, "node [shape=circle]");
+  #Append(str, "edge [len=1.2]");
+  o2n := HashMap(); # object to node names
+  for i in [1..Size(objects)] do
+    o2n[objects[i]] := JoinStringsWithSeparator(["n", str(i)],"");
+    Append(dot, JoinStringsWithSeparator(["n", str(i), "[label=\"", str(objects[i]), "\"]\n"],""));
+  od;
+  #classifying the objects (x,y) pairs by the second element,
+  #thus getting a lookup for the pairs based on y
+  y2xypairs := Classify(objects, l->l[2]);
+  edges2labels := HashMap();
+  for a in arrows do
+    y := a[1];
+    s := a[2];
+    t := a[3];
+    for src in y2xypairs[y] do
+      trg := [Sact(src[1], s), Tact(src[2], t)];
+      edge := Concatenation(o2n[src],"->",o2n[trg]);
+      label := Concatenation(str(ImageListOfTransformation(s)), ",", str(ImageListOfTransformation(t)));
+      if IsBound(edges2labels[edge]) then
+        Add(edges2labels[edge], label);
+      else
+        edges2labels[edge] := [label];
+      fi;
+    od;
+  od;
+  for edge in Keys(edges2labels) do
+    Append(dot, JoinStringsWithSeparator([edge, "[label=\"", JoinStringsWithSeparator(edges2labels[edge],"|"), "\"]\n"],""));
+  od;
+  Append(dot,"}\n");
+  return dot;
+end;
 
 ### CREATING A SURJECTIVE MORPHISM, constructing theta and phi
 # states: subsets of the state set missing one point
