@@ -105,6 +105,26 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
   return true;
 end;
 
+## KERNEL FUNCTIONS ##################################################
+#new attempt - to find the arrows for a single tranformation
+TransformationInTheKernel := function(s, theta, phi, Sact, Tact)
+  local ys, xs, ts, x, y, t;
+  xs := Keys(theta);
+  ts := phi[s]; #all the lifts for s
+  Print("Analyzing s:",s,"\n");
+  for t in ts do
+    Print("Lifted to t:",t,"\n");
+    for x in xs do
+      ys := theta[x]; #all the lifts of x
+      for y in ys do
+        Print("(", x, ",", y, ")->(", Sact(x,s),",",Tact(y,t),")\n");
+      od;
+    od;
+  od;
+  Print("\n");
+end;
+
+
 # identifying arrows with the same action
 Identify := function(arrows, YtoX, Sact)
   local m;
