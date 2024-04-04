@@ -282,11 +282,13 @@ end;
 
 #
 LocalTransformation := function(y,s,t, YtoX)
-local wyinv, wyt, l;
+local wyinv, wyt, l,n;
+n := Maximum(Size(YtoX[y]), Size(YtoX[OnPoints(y,t)])); #we have to adjust for the bigger context
+l := List([1..n], x->x);
   wyinv := Winv(YtoX[y]);
   wyt := W(YtoX[OnPoints(y,t)]);
-l := List([1..Size(YtoX[y])],
-                   k -> wyt(OnPoints(wyinv(k),s)));
+Perform([1..Size(YtoX[y])],
+                   function(k) l[k]:= wyt(OnPoints(wyinv(k),s));end);
 #if (Size(l) = 1) then return IdentityTransformation;
 #else 
 return Transformation(l); 
