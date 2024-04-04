@@ -244,93 +244,6 @@ end;
 ### BUILDING THE EMULATION constructing psi and mu ##############################
 
 # LABELLING
-# gives a function that maps n points to n-1 by skipping i,
-# n degree, i is the hole
-w := function(i)
-  return function(k)
-    if k < i then
-      return k;
-    elif k > i then
-      return k-1;
-    else
-      Error("There is no hole!");
-    fi;
-  end;
-end;
-
-# n degree, i is the hole, the inverse
-winv := function(i)
-  return function(k)
-    if k < i then
-      return k;
-    else
-      return k+1;
-    fi;
-  end;
-end;
-
-# making a transformation from an arrow in the kernel
-Arrow2Transformation := function(y,s,t,n)
-  return Transformation
-             (List([1..n], #should this be n-1?, nope it doesn't work that way
-                   k -> w(OnPoints(y,t))(OnPoints(winv(y)(k),s))));
-end; #we take a point k
-
-## Covering Lemma
-# this does only the knocking out of a single state
-Psi := function(theta)
-  local psi, x, y;
-  psi := EmptyClone(theta);
-  for x in Keys(theta) do
-    for y in theta[x] do
-      AddSet(psi[x], [y,w(y)(x)]); #maybe that should wyinv - which is the same
-    od;
-  od;
-  return psi;
-end;
-
-Mu := function(theta, phi,n)
-  local mu, t, y, s, cs, deps, nt;
-  mu := EmptyClone(phi);
-  for s in Keys(phi) do
-    for t in phi[s] do
-      deps := [];
-      for y in DistinctElts(Values(theta)) do
-        nt := Arrow2Transformation(y,s,t,n-1);
-        if not IsOne(nt) then
-          Add(deps, [[y], nt]);
-        fi;
-      od;#y
-      #Print(Size(deps)," "); # is this to big?
-      #if not IsDuplicateFreeList(deps) then Print("*"); fi;
-      cs := Cascade([n, n-1],Concatenation([[[], t]], deps));
-      #if cs in mu[s] then Print("#");fi; #never seem to happen 
-      AddSet(mu[s],cs);
-    od;#t
-  od;#s
-  return mu;
-end;
-
-TestEmulation := function(S)
-  local theta, phi, psi, mu, n;
-  n := DegreeOfTransformationSemigroup(S);
-  theta := ThetaForDegree(n);
-  phi := PhiForTransformationSemigroup(S);
-  Print("Surjective morphism works? ",
-        IsRelationalMorphism(theta, phi, OnPoints, OnPoints),
-        "\n");
-  psi := Psi(theta);
-  mu := Mu(theta, phi, n);
-  Print("Emulation works? ",
-        IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
-        "\n");
-  Print("Reverse works? ",
-        IsRelationalMorphism(InvertHashMap(psi),
-                             InvertHashMap(mu),
-                             OnCoordinates,
-                             OnPoints),
-        "\n");
-end;
 
 ### trying to do the simplified algorithm
 # returns a function that maps the elements down to the integers
@@ -354,7 +267,7 @@ Winv := function(A)
 end;
 
 # the lifts in the decomposition for the states in the original ts 
-Psi2 := function(theta)
+Psi := function(theta)
   local psi, x, y, w, YtoX;
   psi := EmptyClone(theta);
   YtoX := InvertHashMap(theta);
@@ -395,7 +308,7 @@ MuLift := function(s,t,theta,n)
   Concatenation([[[], t]], deps));
 end;
 
-Mu2 := function(theta, phi,n)
+Mu := function(theta, phi,n)
   local mu, t, y, s, cs, deps, nt;
   mu := EmptyClone(phi);
   for s in Keys(phi) do
@@ -413,7 +326,7 @@ HashMapEq := function(m1, m2)
          ForAll(Keys(m1), k -> m1[k]=m2[k]);
 end;
 
-TestEmulation2 := function(S)
+TestEmulation := function(S)
   local theta, phi, psi, mu, n;
   n := DegreeOfTransformationSemigroup(S);
   theta := ThetaForDegree(n);
@@ -421,8 +334,8 @@ TestEmulation2 := function(S)
   Print("Surjective morphism works? ",
         IsRelationalMorphism(theta, phi, OnPoints, OnPoints),
         "\n");
-  psi := Psi2(theta);
-  mu := Mu2(theta, phi, n);
+  psi := Psi(theta);
+  mu := Mu(theta, phi, n);
   Print("Emulation works? ",
         IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
         "\n");
