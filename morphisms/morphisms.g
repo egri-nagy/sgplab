@@ -64,13 +64,6 @@ Classify := function(elts, f)
   return m;
 end;
 
-# to apply a binary operation for all ordered pairs for set A and B
-# meant to be used in relational morphisms
-ElementwiseProduct := function(A, B, binop)
-  return AsSet(List(EnumeratorOfCartesianProduct(A,B),
-                    p -> binop(p[1],p[2])));
-end;
-
 # the graph of a relation, i.e. all related pairs
 HashMapGraph := function(rel)
   return Concatenation(List(Keys(rel),
@@ -82,9 +75,25 @@ end;
 EmptyClone := function(hashmap)
   return HashMap(List(Keys(hashmap),
                       key -> [key, []]));
-
 end;
+
+# just a quick check for hashmap equality
+# it may miss list equality for values (if not sorted) 
+HashMapEq := function(m1, m2)
+  return (AsSet(Keys(m1)) = AsSet(Keys(m2)))
+         and
+         ForAll(Keys(m1), k -> m1[k]=m2[k]);
+end;
+
 ## RELATIONAL MORPHISMS ##############################################
+
+# to apply a binary operation for all ordered pairs for set A and B
+# meant to be used in relational morphisms
+ElementwiseProduct := function(A, B, binop)
+  return AsSet(List(EnumeratorOfCartesianProduct(A,B),
+                    p -> binop(p[1],p[2])));
+end;
+
 # how to define a relational morphism? from (X,S) to (Y,T)?
 # theta, phi: hashmaps - they have the sources, assumed to be complete
 # using loops so we can provide details when the morphism fails
@@ -289,11 +298,8 @@ l := List([1..n], x->x);
   wyt := W(YtoX[OnPoints(y,t)]);
 Perform([1..Size(YtoX[y])],
                    function(k) l[k]:= wyt(OnPoints(wyinv(k),s));end);
-#if (Size(l) = 1) then return IdentityTransformation;
-#else 
 return Transformation(l); 
-#fi;
-end; #we take a point k
+end;
 
 MuLift := function(s,t,theta,n)
   local y, cs, deps, nt, YtoX, preimgs;
@@ -322,22 +328,24 @@ Mu := function(theta, phi,n)
   return mu;
 end;
 
-HashMapEq := function(m1, m2)
-  return (AsSet(Keys(m1)) = AsSet(Keys(m2)))
-         and
-         ForAll(Keys(m1), k -> m1[k]=m2[k]);
-end;
-
+# Detailed testing script for emulating by a cascade product
+# creates a 2-level decomposition for the given semigroup and tests the
+# emulation both ways
+# uses the covering relmorphism
 TestEmulation := function(S)
-  local theta, phi, psi, mu, n;
+  local theta, phi, psi, mu, n, lifts;
   n := DegreeOfTransformationSemigroup(S);
+  #the standard covering map described in the Covering Lemma paper
   theta := ThetaForDegree(n);
   phi := PhiForTransformationSemigroup(S);
+  #1st to double check that we have a relational morphism
   Print("Surjective morphism works? ",
         IsRelationalMorphism(theta, phi, OnPoints, OnPoints),
         "\n");
+  #now creating the coordinatized version
   psi := Psi(theta);
   mu := Mu(theta, phi, n);
+  # Can the cascade emulation the original
   Print("Emulation works? ",
         IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
         "\n");
@@ -347,4 +355,11 @@ TestEmulation := function(S)
                              OnCoordinates,
                              OnPoints),
         "\n");
+  lifts := DistinctElts(Values(mu));
+  #the size calculation might be heavy for bigger cascade products
+  Print("|S|=", Size(S), " -> (",
+  Size(lifts) , ",",
+  Size(Semigroup(lifts)), ",",
+  Size(Semigroup(Concatenation(List(Generators(S), s-> mu[s])))),
+  ") (#lifts, #Sgp(lifts), #Sgp(mu(Sgens)))");
 end;
