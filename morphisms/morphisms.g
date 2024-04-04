@@ -369,12 +369,15 @@ end;
 
 #
 LocalTransformation := function(y,s,t, YtoX)
-local wyinv, wyt;
+local wyinv, wyt, l;
   wyinv := Winv(YtoX[y]);
   wyt := W(YtoX[OnPoints(y,t)]);
-  return Transformation
-             (List([1..Size(YtoX[y])],
-                   k -> wyt(OnPoints(wyinv(k),s))));
+l := List([1..Size(YtoX[y])],
+                   k -> wyt(OnPoints(wyinv(k),s)));
+#if (Size(l) = 1) then return IdentityTransformation;
+#else 
+return Transformation(l); 
+#fi;
 end; #we take a point k
 
 MuLift := function(s,t,theta,n)
@@ -383,7 +386,7 @@ MuLift := function(s,t,theta,n)
       deps := [];
       for y in DistinctElts(Values(theta)) do
         nt := LocalTransformation(y,s,t, YtoX);
-        Print(nt, "\n");
+        #Print(nt, "\n");
         if not IsOne(nt) then
           Add(deps, [[y], nt]);
         fi;
@@ -408,4 +411,25 @@ HashMapEq := function(m1, m2)
   return (AsSet(Keys(m1)) = AsSet(Keys(m2)))
          and
          ForAll(Keys(m1), k -> m1[k]=m2[k]);
+end;
+
+TestEmulation2 := function(S)
+  local theta, phi, psi, mu, n;
+  n := DegreeOfTransformationSemigroup(S);
+  theta := ThetaForDegree(n);
+  phi := PhiForTransformationSemigroup(S);
+  Print("Surjective morphism works? ",
+        IsRelationalMorphism(theta, phi, OnPoints, OnPoints),
+        "\n");
+  psi := Psi2(theta);
+  mu := Mu2(theta, phi, n);
+  Print("Emulation works? ",
+        IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
+        "\n");
+  Print("Reverse works? ",
+        IsRelationalMorphism(InvertHashMap(psi),
+                             InvertHashMap(mu),
+                             OnCoordinates,
+                             OnPoints),
+        "\n");
 end;
