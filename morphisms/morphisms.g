@@ -269,6 +269,27 @@ winv := function(i)
   end;
 end;
 
+# returns a function that maps the elements down to the integers
+# 1..., as many as needed.
+# A - a set of states (positive integers)
+W := function(A)
+  local m, sA;
+  sA := AsSortedList(A);
+  m := HashMap();
+  Perform(List([1..Size(sA)]), function(i) m[sA[i]]:=i;end);
+  return x -> m[x];
+end;
+
+# the inverse of W
+Winv := function(A)
+  local m, sA;
+  sA := AsSortedList(A);
+  m := HashMap();
+  Perform(List([1..Size(sA)]), function(i) m[i]:=sA[i];end);
+  return x -> m[x];
+end;
+
+
 # making a transformation from an arrow in the kernel
 Arrow2Transformation := function(y,s,t,n)
   return Transformation
