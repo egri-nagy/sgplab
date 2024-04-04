@@ -266,14 +266,15 @@ TestEmulation := function(S)
   ") (#lifts, #Sgp(lifts), #Sgp(mu(Sgens)))");
 end;
 
+#WIP
 ThetaFromHolonomy := function(sk)
-  local theta;
+local theta;
   theta := HashMap();
-  Perform(List[1..DegreeOfSkeleton(sk)],
-        function(x)
-          local lifts;
-          lifts :=  AsSet(List(AllHolonomyCoords(x,sk), First));
-          #something to think about
-          theta[x] := Interpret(sk,1, );
-        end);
+  Perform([1..(DegreeOfSkeleton(sk))],
+         function(x)
+           local lifts;
+           lifts :=  AsSet(List(AllHolonomyCoords(x,sk), First));
+           #something to think about
+           theta[x] := Interpret(sk,1, x);
+         end);
 end;
