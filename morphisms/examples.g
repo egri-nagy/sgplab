@@ -23,9 +23,9 @@ else
   Error("Example 1");
 fi;
 
-Print(IsRelationalMorphism(Psi(ex1theta), Mu(ex1theta, ex1phi, OnPoionts), OnPoints, OnCoordinates));
+#Print(IsRelationalMorphism(Psi(ex1theta), Mu(ex1theta, ex1phi, OnPoionts), OnPoints, OnCoordinates));
 
-PrintTo("ex1mk.dot", DotMorphismKernel(MorphismKernelObjects(ex1theta), MorphismKernelArrows(ex1theta, ex1phi, OnPoints), OnPoints, OnPoints));
+#PrintTo("ex1mk.dot", DotMorphismKernel(MorphismKernelObjects(ex1theta), MorphismKernelArrows(ex1theta, ex1phi, OnPoints), OnPoints, OnPoints));
 
 
 ### EXAMPLE 2 not a relational morphism

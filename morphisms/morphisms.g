@@ -269,27 +269,6 @@ winv := function(i)
   end;
 end;
 
-# returns a function that maps the elements down to the integers
-# 1..., as many as needed.
-# A - a set of states (positive integers)
-W := function(A)
-  local m, sA;
-  sA := AsSortedList(A);
-  m := HashMap();
-  Perform(List([1..Size(sA)]), function(i) m[sA[i]]:=i;end);
-  return x -> m[x];
-end;
-
-# the inverse of W
-Winv := function(A)
-  local m, sA;
-  sA := AsSortedList(A);
-  m := HashMap();
-  Perform(List([1..Size(sA)]), function(i) m[i]:=sA[i];end);
-  return x -> m[x];
-end;
-
-
 # making a transformation from an arrow in the kernel
 Arrow2Transformation := function(y,s,t,n)
   return Transformation
@@ -298,12 +277,13 @@ Arrow2Transformation := function(y,s,t,n)
 end; #we take a point k
 
 ## Covering Lemma
+# this does only the knocking out of a single state
 Psi := function(theta)
   local psi, x, y;
   psi := EmptyClone(theta);
   for x in Keys(theta) do
     for y in theta[x] do
-      AddSet(psi[x], [y,w(y)(x)]);
+      AddSet(psi[x], [y,w(y)(x)]); #maybe that should wyinv - which is the same
     od;
   od;
   return psi;
@@ -350,4 +330,82 @@ TestEmulation := function(S)
                              OnCoordinates,
                              OnPoints),
         "\n");
+end;
+
+### trying to do the simplified algorithm
+# returns a function that maps the elements down to the integers
+# 1..., as many as needed.
+# A - a set of states (positive integers)
+W := function(A)
+  local m, sA;
+  sA := AsSortedList(A);
+  m := HashMap();
+  Perform(List([1..Size(sA)]), function(i) m[sA[i]]:=i;end);
+  return x -> m[x];
+end;
+
+# the inverse of W
+Winv := function(A)
+  local m, sA;
+  sA := AsSortedList(A);
+  m := HashMap();
+  Perform(List([1..Size(sA)]), function(i) m[i]:=sA[i];end);
+  return x -> m[x];
+end;
+
+# the lifts in the decomposition for the states in the original ts 
+Psi2 := function(theta)
+  local psi, x, y, w, YtoX;
+  psi := EmptyClone(theta);
+  YtoX := InvertHashMap(theta);
+  for x in Keys(theta) do
+    for y in theta[x] do
+      w:=W(YtoX[y]); 
+      AddSet(psi[x], [y,w(x)]);
+    od;
+  od;
+  return psi;
+end;
+
+#
+LocalTransformation := function(y,s,t, YtoX)
+local wyinv, wyt;
+  wyinv := Winv(YtoX[y]);
+  wyt := W(YtoX[OnPoints(y,t)]);
+  return Transformation
+             (List([1..Size(YtoX[y])],
+                   k -> wyt(OnPoints(wyinv(k),s))));
+end; #we take a point k
+
+MuLift := function(s,t,theta,n)
+  local y, cs, deps, nt, YtoX, preimgs;
+    YtoX := InvertHashMap(theta);
+      deps := [];
+      for y in DistinctElts(Values(theta)) do
+        nt := LocalTransformation(y,s,t, YtoX);
+        Print(nt, "\n");
+        if not IsOne(nt) then
+          Add(deps, [[y], nt]);
+        fi;
+      od;#y
+  return Cascade([n, Maximum(List(DistinctElts(Values(theta)), y -> Size(YtoX[y])))],
+  Concatenation([[[], t]], deps));
+end;
+
+Mu2 := function(theta, phi,n)
+  local mu, t, y, s, cs, deps, nt;
+  mu := EmptyClone(phi);
+  for s in Keys(phi) do
+    for t in phi[s] do
+         cs := MuLift(s,t,theta,n);
+      AddSet(mu[s],cs);
+    od;#t
+  od;#s
+  return mu;
+end;
+
+HashMapEq := function(m1, m2)
+  return (AsSet(Keys(m1)) = AsSet(Keys(m2)))
+         and
+         ForAll(Keys(m1), k -> m1[k]=m2[k]);
 end;
