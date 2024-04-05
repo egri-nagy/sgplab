@@ -1,4 +1,4 @@
-Read("morphisms.g");
+Read("CoveringLemma.g");
 
 ### EXAMPLE 1 a minimal meaningful example of a surjective morphism
 # joining two states with a transposition
