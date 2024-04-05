@@ -115,28 +115,33 @@ Psi := function(theta)
 end;
 
 # TRANSFORMATIONS
+# given the context y, the top level state, we want to know
+# how the original action of s can be expressed locally on Z
+# the element of U constructed here also depends on t
 LocalTransformation := function(y,s,t, YtoX)
-  local wyinv, wyt, l,n,ypre, ytpre;
+  local wyinv, wyt, l, k, ypre, ytpre;
   ypre := YtoX[y]; #preimages
   ytpre := YtoX[OnPoints(y,t)];
-  n := Maximum(Size(ypre), Size(ytpre)); #we have to adjust for the bigger context
-  l := List([1..n], x->x);
+  k := Maximum(Size(ypre), Size(ytpre)); #adjust for the bigger context
+  l := List([1..k], IdFunc); #we need to prefill the action with identities
   wyinv := Winv(ypre);
   wyt := W(ytpre);
   Perform([1..Size(ypre)],
-         function(k)
-           l[k]:= wyt(OnPoints(wyinv(k),s));
+         function(z)
+           # map z back from the current context,
+           # act by S in X, then map to new context of yt
+           l[z]:= wyt(OnPoints(wyinv(z),s));
          end);
   return Transformation(l);
 end;
 
+# creating a cascade for s when lifted to t
 MuLift := function(s,t,theta,n)
   local y, cs, deps, nt, YtoX, preimgs;
   YtoX := InvertHashMap(theta);
   deps := [];
   for y in DistinctValueElements(theta) do
     nt := LocalTransformation(y,s,t, YtoX);
-    #Print(nt, "\n");
     if not IsOne(nt) then
       Add(deps, [[y], nt]);
     fi;
@@ -145,6 +150,8 @@ MuLift := function(s,t,theta,n)
                  Concatenation([[[], t]], deps));
 end;
 
+# the complet map from S to the cascade product
+# just lift every s with respect to all of its lifts
 Mu := function(theta, phi,n)
   local mu, t, y, s, cs, deps, nt;
   mu := EmptyClone(phi);
