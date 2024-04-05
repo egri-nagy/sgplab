@@ -2,6 +2,7 @@
 # using hash-maps for representing relations
 # working on the covering Lemma algorithm
 
+Read("hashmap.g");
 
 ## RELATIONAL MORPHISMS ##############################################
 
@@ -125,14 +126,14 @@ MuLift := function(s,t,theta,n)
   local y, cs, deps, nt, YtoX, preimgs;
     YtoX := InvertHashMap(theta);
       deps := [];
-      for y in DistinctElts(Values(theta)) do
+      for y in DistinctValueElements(theta) do
         nt := LocalTransformation(y,s,t, YtoX);
         #Print(nt, "\n");
         if not IsOne(nt) then
           Add(deps, [[y], nt]);
         fi;
       od;#y
-  return Cascade([n, Maximum(List(DistinctElts(Values(theta)), y -> Size(YtoX[y])))],
+  return Cascade([n, Maximum(List(DistinctValueElements(theta), y -> Size(YtoX[y])))],
   Concatenation([[[], t]], deps));
 end;
 
@@ -175,7 +176,7 @@ TestEmulation := function(S)
                              OnCoordinates,
                              OnPoints),
         "\n");
-  lifts := DistinctElts(Values(mu));
+  lifts := DistinctValueElements(mu);
   #the size calculation might be heavy for bigger cascade products
   Print("|S|=", Size(S), " -> (",
   Size(lifts) , ",",

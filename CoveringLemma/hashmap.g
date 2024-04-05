@@ -3,14 +3,14 @@
 # given a set-valued hashmap m this returns all the distince elements from
 # all image sets
 DistinctValueElements := function(m)
-  return AsSet(Concatenation(AsSet(Keys(m))));
+  return AsSet(Concatenation(AsSet(Values(m))));
 end;
 
 # turning around a hashmap
 InvertHashMap := function(rel)
   local m;
   #putting in all values as keys with empty value set for now
-  m := HashMap(List(DistinctElts(Values(rel)),
+  m := HashMap(List(DistinctValueElements(rel),
                     x -> [x,[]]));
   Perform(Keys(rel),
          function(k)
