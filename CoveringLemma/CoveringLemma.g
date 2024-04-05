@@ -1,21 +1,21 @@
-# general functions for (relational) morphisms
-# using hash-maps for representing relations
 # working on the covering Lemma algorithm
 
+# using hash-maps for representing relations
 Read("hashmap.g");
 
 ## RELATIONAL MORPHISMS ##############################################
 
 # to apply a binary operation for all ordered pairs for set A and B
-# meant to be used in relational morphisms
+# meant to be used in relational morphisms, only distinct elements returned
 ElementwiseProduct := function(A, B, binop)
   return AsSet(List(EnumeratorOfCartesianProduct(A,B),
                     p -> binop(p[1],p[2])));
 end;
 
 # how to define a relational morphism? from (X,S) to (Y,T)?
-# theta, phi: hashmaps - they have the sources, assumed to be complete
-# using loops so we can provide details when the morphism fails
+# theta: for states, hashmap from X to subsets of Y
+# phi: for transformations, hashmap from S to subsets of T
+# Sact, Tact: functions for the actions in the ts's, e.g., OnPoints
 IsRelationalMorphism := function(theta, phi, Sact, Tact)
   local x,s,
         inS, inT; #where is the action computed
@@ -33,18 +33,9 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
   return true;
 end;
 
-### CREATING A SURJECTIVE MORPHISM, constructing theta and phi
-# states: subsets of the state set missing one point
-# transformations: permutations or constant maps
+### CREATING A SURJECTIVE MORPHISM, constructing theta and phi - the default method
 
-# deciding whether a transformation is actually a permutation
-# note: IsPerm is about the ype of the object
-IsPermutation := function(t)
-  return DegreeOfTransformation(t)
-         =
-         Size(AsSet(ImageListOfTransformation(t)));
-end;
-
+# STATES: subsets of the state set missing one point
 # creates a relation on states for the full transformation semigroup
 # a state goes to a set of all states except itself
 ThetaForDegree := function(n) #we only need the number of states, the degree
@@ -52,19 +43,28 @@ ThetaForDegree := function(n) #we only need the number of states, the degree
                       x -> [x, Difference([1..n],[x])]));
 end;
 
-# if it is a permutation, then leave, otherwise to a set of constant maps to points
-# not in the image
+# TRANSFORMATIONS: permutations or constant maps
+
+# deciding whether a transformation is actually a permutation
+# note: IsPerm is about the type of the object
+IsPermutation := function(t)
+  return DegreeOfTransformation(t)
+         =
+         Size(AsSet(ImageListOfTransformation(t)));
+end;
+
+# if it is a permutation, then the image is the same,
+# otherwise to a set of constant maps to points not in the image
 PhiForTransformationSemigroup := function(S)
   local f,n;
   n := DegreeOfTransformationSemigroup(S);
   f := function(s)
     if IsPermutation(s) then
-      return [s];
+      return [s]; # still a set, but a singleton
     else
       # warning: giving n to ImageListOfTransformation is crucial here!
       # otherwise, we may add constant maps for the ignored highest fixed point(s)
-      return List(Difference([1..n],
-                             AsSet(ImageListOfTransformation(s,n))),
+      return List(Difference([1..n],AsSet(ImageListOfTransformation(s,n))),
                   x -> ConstantTransformation(n,x));
     fi;
   end;
@@ -73,21 +73,23 @@ end;
 
 ### BUILDING THE EMULATION constructing psi and mu ##############################
 
-# LABELLING
+# LABELLING i.e. constructing (Z,U)
 
-### trying to do the simplified algorithm
-# returns a function that maps the elements down to the integers
-# 1..., as many as needed.
+# STATES
+# returns a function that maps the elements of a set of k integers down to the
+# the set 1,...,n, 'squashing them to the bottom'
 # A - a set of states (positive integers)
+# it returns fail if the input is undefined (by the hashmap inside)
+# intuition: this encodes the original states in X into Z
 W := function(A)
   local m, sA;
-  sA := AsSortedList(A);
+  sA := AsSortedList(A); #to make sure they are in order
   m := HashMap();
   Perform(List([1..Size(sA)]), function(i) m[sA[i]]:=i;end);
   return x -> m[x];
 end;
 
-# the inverse of W
+# the inverse of W, decodes the states in U back to ones from X
 Winv := function(A)
   local m, sA;
   sA := AsSortedList(A);
@@ -96,45 +98,47 @@ Winv := function(A)
   return x -> m[x];
 end;
 
-# the lifts in the decomposition for the states in the original ts 
+# the lifts in the decomposition for the states in the original ts
+# idea: take a state x, and for all of its images y (the top level coordinate),
+# find all the pre-images of y (the context)
 Psi := function(theta)
   local psi, x, y, w, YtoX;
   psi := EmptyClone(theta);
   YtoX := InvertHashMap(theta);
   for x in Keys(theta) do
     for y in theta[x] do
-      w:=W(YtoX[y]); 
+      w:=W(YtoX[y]);
       AddSet(psi[x], [y,w(x)]);
     od;
   od;
   return psi;
 end;
 
-#
+# TRANSFORMATIONS
 LocalTransformation := function(y,s,t, YtoX)
-local wyinv, wyt, l,n;
-n := Maximum(Size(YtoX[y]), Size(YtoX[OnPoints(y,t)])); #we have to adjust for the bigger context
-l := List([1..n], x->x);
+  local wyinv, wyt, l,n;
+  n := Maximum(Size(YtoX[y]), Size(YtoX[OnPoints(y,t)])); #we have to adjust for the bigger context
+  l := List([1..n], x->x);
   wyinv := Winv(YtoX[y]);
   wyt := W(YtoX[OnPoints(y,t)]);
-Perform([1..Size(YtoX[y])],
-                   function(k) l[k]:= wyt(OnPoints(wyinv(k),s));end);
-return Transformation(l); 
+  Perform([1..Size(YtoX[y])],
+          function(k) l[k]:= wyt(OnPoints(wyinv(k),s));end);
+  return Transformation(l); 
 end;
 
 MuLift := function(s,t,theta,n)
   local y, cs, deps, nt, YtoX, preimgs;
-    YtoX := InvertHashMap(theta);
-      deps := [];
-      for y in DistinctValueElements(theta) do
-        nt := LocalTransformation(y,s,t, YtoX);
-        #Print(nt, "\n");
-        if not IsOne(nt) then
-          Add(deps, [[y], nt]);
-        fi;
-      od;#y
+  YtoX := InvertHashMap(theta);
+  deps := [];
+  for y in DistinctValueElements(theta) do
+    nt := LocalTransformation(y,s,t, YtoX);
+    #Print(nt, "\n");
+    if not IsOne(nt) then
+      Add(deps, [[y], nt]);
+    fi;
+  od;#y
   return Cascade([n, Maximum(List(DistinctValueElements(theta), y -> Size(YtoX[y])))],
-  Concatenation([[[], t]], deps));
+                 Concatenation([[[], t]], deps));
 end;
 
 Mu := function(theta, phi,n)
@@ -142,7 +146,7 @@ Mu := function(theta, phi,n)
   mu := EmptyClone(phi);
   for s in Keys(phi) do
     for t in phi[s] do
-         cs := MuLift(s,t,theta,n);
+      cs := MuLift(s,t,theta,n);
       AddSet(mu[s],cs);
     od;#t
   od;#s
@@ -179,10 +183,10 @@ TestEmulation := function(S)
   lifts := DistinctValueElements(mu);
   #the size calculation might be heavy for bigger cascade products
   Print("|S|=", Size(S), " -> (",
-  Size(lifts) , ",",
-  Size(Semigroup(lifts)), ",",
-  Size(Semigroup(Concatenation(List(Generators(S), s-> mu[s])))),
-  ") (#lifts, #Sgp(lifts), #Sgp(mu(Sgens)))");
+        Size(lifts) , ",",
+        Size(Semigroup(lifts)), ",",
+        Size(Semigroup(Concatenation(List(Generators(S), s-> mu[s])))),
+        ") (#lifts, #Sgp(lifts), #Sgp(mu(Sgens)))");
 end;
 
 #WIP
