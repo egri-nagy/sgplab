@@ -116,14 +116,18 @@ end;
 
 # TRANSFORMATIONS
 LocalTransformation := function(y,s,t, YtoX)
-  local wyinv, wyt, l,n;
-  n := Maximum(Size(YtoX[y]), Size(YtoX[OnPoints(y,t)])); #we have to adjust for the bigger context
+  local wyinv, wyt, l,n,ypre, ytpre;
+  ypre := YtoX[y]; #preimages
+  ytpre := YtoX[OnPoints(y,t)];
+  n := Maximum(Size(ypre), Size(ytpre)); #we have to adjust for the bigger context
   l := List([1..n], x->x);
-  wyinv := Winv(YtoX[y]);
-  wyt := W(YtoX[OnPoints(y,t)]);
-  Perform([1..Size(YtoX[y])],
-          function(k) l[k]:= wyt(OnPoints(wyinv(k),s));end);
-  return Transformation(l); 
+  wyinv := Winv(ypre);
+  wyt := W(ytpre);
+  Perform([1..Size(ypre)],
+         function(k)
+           l[k]:= wyt(OnPoints(wyinv(k),s));
+         end);
+  return Transformation(l);
 end;
 
 MuLift := function(s,t,theta,n)
