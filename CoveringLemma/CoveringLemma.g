@@ -123,7 +123,7 @@ LocalTransformation := function(y,s,t, YtoX)
   ypre := YtoX[y]; #preimages
   ytpre := YtoX[OnPoints(y,t)];
   k := Maximum(Size(ypre), Size(ytpre)); #adjust for the bigger context
-  l := List([1..k], IdFunc); #we need to prefill the action with identities
+  l := [1..k]; #we need to prefill the action with identities
   wyinv := Winv(ypre);
   wyt := W(ytpre);
   Perform([1..Size(ypre)],
