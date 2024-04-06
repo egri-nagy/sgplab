@@ -204,11 +204,25 @@ end;
 ThetaFromHolonomy := function(sk)
 local theta;
   theta := HashMap();
-  Perform([1..(DegreeOfSkeleton(sk))],
+  Perform([1..DegreeOfSkeleton(sk)],
          function(x)
-           local lifts;
-           lifts :=  AsSet(List(AllHolonomyCoords(x,sk), First));
-           #something to think about
-           theta[x] := Interpret(sk,1, x);
+           theta[x] := AsSet(List(AllHolonomyCoords(x,sk), First));
          end);
+  return theta;
+end;
+
+PhiForHolonomy := function(sk)
+local phi;
+  phi := HashMap();
+  Perform(TransSgp(sk),
+         function(s)
+           local top;
+           top := AsHolonomyCascade(s,sk)[1];
+           if IsEmpty(top) then
+             phi[s] := [IdentityTransformation];
+           else
+             phi[s] := [top[1][2]];
+           fi;
+         end);
+  return phi;
 end;
