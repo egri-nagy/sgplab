@@ -114,6 +114,15 @@ Psi := function(theta)
   return psi;
 end;
 
+PsiInvFunc := function(coords,theta)
+  local y,z, YtoX,winv;
+  y := coords[1];
+  z:= coords[2];
+  YtoX := InvertHashMap(theta); #TODO this is expensive!
+  winv := Winv(YtoX[y]);
+  return winv(z);
+end;
+
 # TRANSFORMATIONS
 # given the context y, the top level state, we want to know
 # how the original action of s can be expressed locally on Z
