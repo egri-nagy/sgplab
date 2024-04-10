@@ -23,8 +23,7 @@ else
   Error("Example 1");
 fi;
 
-#this does not work, what is wrong with the above relmorphism?
-#Print(IsRelationalMorphism(Psi(ex1theta), Mu(ex1theta, ex1phi, OnPoionts), OnPoints, OnCoordinates));
+Print(IsRelationalMorphism(Psi(ex1theta), Mu(ex1theta, ex1phi, 3), OnPoints, OnCoordinates));
 
 #PrintTo("ex1mk.dot", DotMorphismKernel(MorphismKernelObjects(ex1theta), MorphismKernelArrows(ex1theta, ex1phi, OnPoints), OnPoints, OnPoints));
 
