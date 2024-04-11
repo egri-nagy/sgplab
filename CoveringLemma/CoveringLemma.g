@@ -245,4 +245,20 @@ CollapsingPhi := function(transformations)
   return HashMap(List(transformations, s-> [s,[IdentityTransformation]]));
 end;
 
-##### local transformation monoid
+
+##### local transformation monoid by idempotent e #############################
+LocalTheta := function(states, e)
+  return HashMap(List(states, x-> [x,[OnPoints(x,e)]]));
+end;
+
+LocalPhi := function(transformations, e)
+  return HashMap(List(transformations, s-> [s,[e*s*e]]));
+end;
+
+#it is a rare property - mostly just the identity or constant maps
+TestForMorphicLocalMonoid := function(S)
+return Filtered(Idempotents(S),
+                e -> IsRelationalMorphism(LocalTheta([1..DegreeOfTransformationSemigroup(S)],e),
+                                          LocalPhi(S, e),
+                                          OnPoints, OnPoints));
+end;
