@@ -92,4 +92,17 @@ Print(IsRelationalMorphism(InvertHashMap(Psi(ex5theta)),
 S := RandomSemigroup(IsTransformationSemigroup, 3,5);
 Print(IsRelationalMorphism(Psi(ThetaForDegree(5)), Mu(ThetaForDegree(5),PhiForTransformationSemigroup(S),5), OnPoints, OnCoordinates));
 
+##
+IdTheta := function(states)
+  return HashMap(List(states, x-> [x,[x]]));
+end;
 
+# this is not a morphism
+NoPermPhi := function(S)
+  return HashMap(List(S, function(s)
+                       if IsPermutation(s) then
+                         return [s,[IdentityTransformation]];
+                       else
+                         return [s,[s]];
+                       fi;end));
+end;
