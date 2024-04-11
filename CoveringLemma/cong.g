@@ -21,6 +21,26 @@ ReverseLookup := function(partition)
                                     eqcl -> List(eqcl,
                                                  x -> [x, eqcl]))));
 end;
+
+CongTheta := function(partition)
+  local sorted,rl;
+  sorted := AsSortedList(List(partition, eqcl -> AsSortedList(eqcl)));
+  rl := ReverseLookup(sorted);
+  return HashMap(Concatenation(List(sorted,
+                                    eqcl -> List(eqcl,
+                                                 x -> [x, [Position(sorted, rl[x])]]))));
+end;
+
+CongPhi := function(partition, S)
+  local sorted,rl;
+  sorted := AsSortedList(List(partition, eqcl -> AsSortedList(eqcl)));
+  rl := ReverseLookup(sorted);
+  return HashMap(List(S,
+                      s -> [s, [Transformation(List(sorted,
+                                                    eqcl -> Position(sorted,
+                                                                     rl[First(OnSets(eqcl,s))])))]]));
+end;
+
 StateCongruenceBySeed := function(S, seed)
   local n, partition, m, gens, collapsible;
   n := DegreeOfTransformationSemigroup(S);
@@ -36,3 +56,4 @@ StateCongruenceBySeed := function(S, seed)
   until IsEmpty(collapsible);
   return partition;
 end;
+
