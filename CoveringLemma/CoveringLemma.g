@@ -161,8 +161,9 @@ end;
 
 # the complet map from S to the cascade product
 # just lift every s with respect to all of its lifts
-Mu := function(theta, phi,n)
-  local mu, t, y, s, cs, deps, nt;
+Mu := function(theta, phi)
+  local mu, t, y, s, cs, deps, nt, n;
+  n := Size(DistinctValueElements(theta)); # #states of top level
   mu := EmptyClone(phi);
   for s in Keys(phi) do
     for t in phi[s] do
@@ -189,7 +190,7 @@ TestEmulation := function(S)
         "\n");
   #now creating the coordinatized version
   psi := Psi(theta);
-  mu := Mu(theta, phi, n);
+  mu := Mu(theta, phi);
   # Can the cascade emulation the original
   Print("Emulation works? ",
         IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),

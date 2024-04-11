@@ -23,7 +23,7 @@ else
   Error("Example 1");
 fi;
 
-Print(IsRelationalMorphism(Psi(ex1theta), Mu(ex1theta, ex1phi, 3), OnPoints, OnCoordinates));
+Print(IsRelationalMorphism(Psi(ex1theta), Mu(ex1theta, ex1phi), OnPoints, OnCoordinates));
 
 #PrintTo("ex1mk.dot", DotMorphismKernel(MorphismKernelObjects(ex1theta), MorphismKernelArrows(ex1theta, ex1phi, OnPoints), OnPoints, OnPoints));
 
@@ -65,13 +65,13 @@ Print(IsRelationalMorphism(ex4theta, ex4phi, OnPoints, OnPoints));
 
 #checking the morphism into the coordinatized form
 Print(IsRelationalMorphism(Psi(ex4theta),
-                           Mu(ex4theta, ex4phi,3),
+                           Mu(ex4theta, ex4phi),
                            OnPoints,
                            OnCoordinates));
 
 # and back, from the cascade to the original
 Print(IsRelationalMorphism(InvertHashMap(Psi(ex4theta)),
-                           InvertHashMap(Mu(ex4theta, ex4phi,3)),
+                           InvertHashMap(Mu(ex4theta, ex4phi)),
                            OnCoordinates,
                            OnPoints),"\n");
 
@@ -79,18 +79,18 @@ Print(IsRelationalMorphism(InvertHashMap(Psi(ex4theta)),
 ex5theta := ThetaForDegree(5);
 ex5phi := PhiForTransformationSemigroup(FullTransformationSemigroup(5));
 Print(IsRelationalMorphism(Psi(ex5theta),
-                           Mu(ex5theta, ex5phi,5),
+                           Mu(ex5theta, ex5phi),
                            OnPoints,
                            OnCoordinates));
 
 Print(IsRelationalMorphism(InvertHashMap(Psi(ex5theta)),
-                           InvertHashMap(Mu(ex5theta, ex5phi,5)),
+                           InvertHashMap(Mu(ex5theta, ex5phi)),
                            OnCoordinates,
                            OnPoints));
 
 
 S := RandomSemigroup(IsTransformationSemigroup, 3,5);
-Print(IsRelationalMorphism(Psi(ThetaForDegree(5)), Mu(ThetaForDegree(5),PhiForTransformationSemigroup(S),5), OnPoints, OnCoordinates));
+Print(IsRelationalMorphism(Psi(ThetaForDegree(5)), Mu(ThetaForDegree(5),PhiForTransformationSemigroup(S)), OnPoints, OnCoordinates));
 
 ##
 IdTheta := function(states)
