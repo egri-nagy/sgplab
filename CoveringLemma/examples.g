@@ -44,9 +44,9 @@ else
 fi;
 
 ### EXAMPLE 3 #######################
-# T2 to itself, isomorphism
-ex3theta := HashMap(List([1,2], x-> [x,[x]]));
-ex3phi := HashMap(List(FullTransformationSemigroup(2), s-> [s,[s]]));
+# T3 to itself, isomorphism
+ex3theta := HashMap(List([1,2,3], x-> [x,[x]]));
+ex3phi := HashMap(List(FullTransformationSemigroup(3), s-> [s,[s]]));
 
 if IsRelationalMorphism(ex3theta, ex3phi, OnPoints, OnPoints) then
   Display("Example 3 OK");
@@ -91,3 +91,5 @@ Print(IsRelationalMorphism(InvertHashMap(Psi(ex5theta)),
 
 S := RandomSemigroup(IsTransformationSemigroup, 3,5);
 Print(IsRelationalMorphism(Psi(ThetaForDegree(5)), Mu(ThetaForDegree(5),PhiForTransformationSemigroup(S),5), OnPoints, OnCoordinates));
+
+

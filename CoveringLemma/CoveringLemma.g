@@ -235,3 +235,14 @@ local phi;
          end);
   return phi;
 end;
+
+####### extreme collapsing
+CollapsingTheta := function(states)
+  return HashMap(List(states, x-> [x,[1]]));
+end;
+
+CollapsingPhi := function(transformations)
+  return HashMap(List(transformations, s-> [s,[IdentityTransformation]]));
+end;
+
+##### local transformation monoid
