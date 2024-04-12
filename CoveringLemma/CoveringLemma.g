@@ -114,12 +114,13 @@ Psi := function(theta)
   return psi;
 end;
 
-PsiInvFunc := function(coords,theta)
-  local y,z, YtoX,winv;
+# for the coordinates we return the original state
+# Where does z go? It depends on the top level state.
+PsiInvFunc := function(coords,thetainv)
+  local y,z,winv;
   y := coords[1];
   z:= coords[2];
-  YtoX := InvertHashMap(theta); #TODO this is expensive!
-  winv := Winv(YtoX[y]);
+  winv := Winv(thetainv[y]); # thetainv: Y -> X
   return winv(z);
 end;
 
@@ -172,6 +173,10 @@ Mu := function(theta, phi)
     od;#t
   od;#s
   return mu;
+end;
+
+#returns a transformation in S
+MuInvFunc := function(cs)
 end;
 
 # Detailed testing script for emulating by a cascade product
