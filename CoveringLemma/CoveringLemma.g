@@ -101,15 +101,21 @@ end;
 # the lifts in the decomposition for the states in the original ts
 # idea: take a state x, and for all of its images y (the top level coordinate),
 # find all the pre-images of y (the context)
+PsiFunc := function(x, theta, thetainv)
+  return List(theta[x],
+             function(y)
+               local w;
+               w := W(thetainv[y]);
+               return [y,w(x)];
+             end);
+end;
+
 Psi := function(theta)
-  local psi, x, y, w, YtoX;
-  psi := EmptyClone(theta);
+  local x,YtoX, psi;
+  psi := HashMap();
   YtoX := InvertHashMap(theta);
   for x in Keys(theta) do
-    for y in theta[x] do
-      w:=W(YtoX[y]);
-      AddSet(psi[x], [y,w(x)]);
-    od;
+      psi[x] := PsiFunc(x, theta, YtoX);
   od;
   return psi;
 end;
