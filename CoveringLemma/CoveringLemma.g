@@ -177,17 +177,18 @@ MuLift := function(s,t,theta,n)
                  Concatenation([[[], t]], deps));
 end;
 
+MuFunc := function(s, ts, theta, n)
+  return List(ts, t-> MuLift(s,t,theta, n));
+end;
+
 # the complet map from S to the cascade product
 # just lift every s with respect to all of its lifts
 Mu := function(theta, phi)
   local mu, t, y, s, cs, deps, nt, n;
   n := Size(DistinctValueElements(theta)); # #states of top level
-  mu := EmptyClone(phi);
+  mu := HashMap();#EmptyClone(phi);
   for s in Keys(phi) do
-    for t in phi[s] do
-      cs := MuLift(s,t,theta,n);
-      AddSet(mu[s],cs);
-    od;#t
+    mu[s] := MuFunc(s, phi[s], theta,n);
   od;#s
   return mu;
 end;
