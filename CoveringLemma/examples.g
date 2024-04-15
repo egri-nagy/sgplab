@@ -1,7 +1,7 @@
 Read("CoveringLemma.g");
 
 ### EXAMPLE 1 a minimal meaningful example of a surjective morphism
-# joining two states with a transposition
+# joining two states with a transposition defined on them
 ex1S := Semigroup(Transformation([1,3,2]), #transposition of 2 and 3
                   Transformation([1,1,1]),
                   Transformation([2,2,2]));
@@ -17,13 +17,8 @@ ex1phi := HashMap([[Transformation([1,2,3]), [Transformation([1,2])]],
                    [Transformation([3,3,3]), [Transformation([2,2])]],
                    [Transformation([1,3,2]), [Transformation([1,2])]]]);
 
-if IsRelationalMorphism(ex1theta, ex1phi, OnPoints, OnPoints) then
-  Display("Example 1 OK");
-else
-  Error("Example 1");
-fi;
-
-Print(IsRelationalMorphism(Psi(ex1theta), Mu(ex1theta, ex1phi), OnPoints, OnCoordinates));
+TestEmulationWithMorphism(ex1S, ex1theta, ex1phi);
+TestEmulation(ex1S);
 
 #PrintTo("ex1mk.dot", DotMorphismKernel(MorphismKernelObjects(ex1theta), MorphismKernelArrows(ex1theta, ex1phi, OnPoints), OnPoints, OnPoints));
 

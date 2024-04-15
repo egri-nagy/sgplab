@@ -180,15 +180,10 @@ MuInvFunc := function(cs)
 end;
 
 # Detailed testing script for emulating by a cascade product
-# creates a 2-level decomposition for the given semigroup and tests the
-# emulation both ways
-# uses the covering relmorphism
-TestEmulation := function(S)
-  local theta, phi, psi, mu, n, lifts;
-  n := DegreeOfTransformationSemigroup(S);
-  #the standard covering map described in the Covering Lemma paper
-  theta := ThetaForDegree(n);
-  phi := PhiForTransformationSemigroup(S);
+# creates a 2-level decomposition for the given semigroup and input
+# surjective morphism and tests the emulation and interpretations
+TestEmulationWithMorphism := function(S,theta, phi)
+  local psi, mu, lifts;
   #1st to double check that we have a relational morphism
   Print("Surjective morphism works? ",
         IsRelationalMorphism(theta, phi, OnPoints, OnPoints),
@@ -200,7 +195,7 @@ TestEmulation := function(S)
   Print("Emulation works? ",
         IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
         "\n");
-  Print("Reverse works? ",
+  Print("Interpretation works? ",
         IsRelationalMorphism(InvertHashMap(psi),
                              InvertHashMap(mu),
                              OnCoordinates,
@@ -213,6 +208,16 @@ TestEmulation := function(S)
         Size(Semigroup(lifts)), ",",
         Size(Semigroup(Concatenation(List(Generators(S), s-> mu[s])))),
         ") (#lifts, #Sgp(lifts), #Sgp(mu(Sgens)))");
+end;
+
+# creates the default n(n-1) covering
+TestEmulation := function(S)
+local n, theta, phi;
+  n := DegreeOfTransformationSemigroup(S);
+  #the standard covering map described in the Covering Lemma paper
+  theta := ThetaForDegree(n);
+  phi := PhiForTransformationSemigroup(S);
+  TestEmulationWithMorphism(S, theta, phi);
 end;
 
 #WIP
