@@ -194,7 +194,48 @@ Mu := function(theta, phi)
 end;
 
 #returns a transformation in S
-MuInvFunc := function(cs)
+MuInvFunc := function(cs, theta)
+  local y, wy,t,u,wytinv, thetainv,x, m,xs,n,l;
+  thetainv := InvertHashMap(theta);
+  m := HashMap();
+  n := Size(Keys(theta));
+  for y in DistinctValueElements(theta) do
+    wy := W(thetainv[y]);
+    t :=  OnDepArg([], DependencyFunctionsOf(cs)[1]);
+    u := OnDepArg([y], DependencyFunctionsOf(cs)[2]);
+    wytinv := Winv(thetainv[OnPoints(y,t)]);
+    #Print(wy*u*wytinv);
+    for x in thetainv[y] do
+      xs :=  wy(OnPoints(wytinv(x),u));
+      #Print(x , " -> ",xs, "\n");
+      if IsBound(m[x]) then
+        if m[x] <> xs then Error(); fi; #this can be removed later
+      else
+        m[x] := xs;
+      fi;
+#      Print(m, "hell\n");
+      l := List([1..n], function(i)
+                 if IsBound(m[i]) then
+                   return m[i];
+                 else
+                   return i;
+                 fi; end);
+ #     Print(l, "\n");
+      return Transformation(l);
+    od;
+  od;
+end;
+
+MuCheck := function(theta, phi)
+  local s, lifts,n,css, cs;
+  n := Size(DistinctValueElements(theta));
+  for s in Keys(phi) do
+    css := MuFunc(s, phi[s], theta, n);
+    for cs in css do
+      Print(s, " =? ", MuInvFunc(cs,theta), "\n");
+    od;
+  od;
+  return true;
 end;
 
 # Detailed testing script for emulating by a cascade product
