@@ -186,7 +186,7 @@ end;
 Mu := function(theta, phi)
   local mu, t, y, s, cs, deps, nt, n;
   n := Size(DistinctValueElements(theta)); # #states of top level
-  mu := HashMap();#EmptyClone(phi);
+  mu := HashMap();
   for s in Keys(phi) do
     mu[s] := MuFunc(s, phi[s], theta,n);
   od;#s
@@ -195,7 +195,7 @@ end;
 
 #returns a transformation in S
 MuInvFunc := function(cs, theta)
-  local y, wy,t,u,wytinv, thetainv,x, m,xs,n,l;
+  local y, wy,t,u,wytinv, thetainv,x, m,xs,n;
   thetainv := InvertHashMap(theta);
   m := HashMap();
   n := Size(Keys(theta)); # |X|
@@ -215,16 +215,11 @@ MuInvFunc := function(cs, theta)
       fi;
     od;
   od;
-  l := List([1..n], function(i)
-             if IsBound(m[i]) then
-               return m[i];
-             else
-               return i;
-             fi; end);
-  #     Print(l, "\n");
-  return Transformation(l);
+  return Transformation(List([1..n], i -> m[i]));
 end;
 
+# checks whether the emulation composed with interpretation IE
+# is the identity on S
 MuCheck := function(theta, phi)
   local s, lifts,n,css, cs,ss;
   n := Size(DistinctValueElements(theta)); # |Y|
