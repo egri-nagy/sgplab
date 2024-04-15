@@ -202,11 +202,11 @@ MuInvFunc := function(cs, theta)
   for y in DistinctValueElements(theta) do
     wy := W(thetainv[y]);
     t :=  OnDepArg([], DependencyFunctionsOf(cs)[1]);
-    u := OnDepArg([y], DependencyFunctionsOf(cs)[2]);
     wytinv := Winv(thetainv[OnPoints(y,t)]);
+    u := OnDepArg([y], DependencyFunctionsOf(cs)[2]);
     #Print(wy*u*wytinv);
     for x in thetainv[y] do
-      xs :=  wy(OnPoints(wytinv(x),u));
+      xs :=  wytinv(OnPoints(wy(x),u));
       #Print(x , " -> ",xs, "\n");
       if IsBound(m[x]) then
         if m[x] <> xs then Error(); fi; #this can be removed later
@@ -227,12 +227,13 @@ MuInvFunc := function(cs, theta)
 end;
 
 MuCheck := function(theta, phi)
-  local s, lifts,n,css, cs;
+  local s, lifts,n,css, cs,ss;
   n := Size(DistinctValueElements(theta));
   for s in Keys(phi) do
     css := MuFunc(s, phi[s], theta, n);
     for cs in css do
-      Print(s, " =? ", MuInvFunc(cs,theta), "\n");
+      ss := MuInvFunc(cs,theta);
+      if s <> ss then Print(s, " <> ", ss, "\n"); fi;
     od;
   od;
   return true;
