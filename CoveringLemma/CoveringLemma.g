@@ -130,6 +130,17 @@ PsiInvFunc := function(coords,thetainv)
   return winv(z);
 end;
 
+PsiCheck := function(theta)
+  local x, thetainv;
+  thetainv := InvertHashMap(theta);
+  for x in Keys(theta) do
+    if not (ForAll(PsiFunc(x, theta, thetainv),
+                   coordpair -> x = PsiInvFunc(coordpair, thetainv))) then
+      Print("Problem with state ",x );
+    fi;
+  od;
+  return true;
+end;
 # TRANSFORMATIONS
 # given the context y, the top level state, we want to know
 # how the original action of s can be expressed locally on Z
