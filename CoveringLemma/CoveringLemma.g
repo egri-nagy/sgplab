@@ -198,10 +198,10 @@ MuInvFunc := function(cs, theta)
   local y, wy,t,u,wytinv, thetainv,x, m,xs,n,l;
   thetainv := InvertHashMap(theta);
   m := HashMap();
-  n := Size(Keys(theta));
+  n := Size(Keys(theta)); # |X|
   for y in DistinctValueElements(theta) do
     wy := W(thetainv[y]);
-    t :=  OnDepArg([], DependencyFunctionsOf(cs)[1]);
+    t := OnDepArg([], DependencyFunctionsOf(cs)[1]);
     wytinv := Winv(thetainv[OnPoints(y,t)]);
     u := OnDepArg([y], DependencyFunctionsOf(cs)[2]);
     #Print(wy*u*wytinv);
@@ -213,27 +213,26 @@ MuInvFunc := function(cs, theta)
       else
         m[x] := xs;
       fi;
-#      Print(m, "hell\n");
-      l := List([1..n], function(i)
-                 if IsBound(m[i]) then
-                   return m[i];
-                 else
-                   return i;
-                 fi; end);
- #     Print(l, "\n");
-      return Transformation(l);
     od;
   od;
+  l := List([1..n], function(i)
+             if IsBound(m[i]) then
+               return m[i];
+             else
+               return i;
+             fi; end);
+  #     Print(l, "\n");
+  return Transformation(l);
 end;
 
 MuCheck := function(theta, phi)
   local s, lifts,n,css, cs,ss;
-  n := Size(DistinctValueElements(theta));
+  n := Size(DistinctValueElements(theta)); # |Y|
   for s in Keys(phi) do
     css := MuFunc(s, phi[s], theta, n);
     for cs in css do
       ss := MuInvFunc(cs,theta);
-      if s <> ss then Print(s, " <> ", ss, "\n"); fi;
+      if s <> ss then Print("s", s, " <> ss", ss, "\n"); return false; fi;
     od;
   od;
   return true;
