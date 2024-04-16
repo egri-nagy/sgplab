@@ -101,3 +101,13 @@ NoPermPhi := function(S)
                          return [s,[s]];
                        fi;end));
 end;
+
+### trying to fix the bad example
+ex6S := Semigroup(Transformation([2,3,1,5,4]));
+
+ex6theta := HashMap([[1,[1]],
+                     [2,[1]],
+                     [3,[1]],
+                     [4,[2]],
+                     [5,[2]]]);
+

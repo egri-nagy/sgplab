@@ -167,12 +167,13 @@ end;
 # given the context y, the top level state, we want to know
 # how the original action of s can be expressed locally on Z
 # the element of U constructed here also depends on t
-LocalTransformation := function(y,s,t, YtoX)
-  local wyinv, wyt, l, k, ypre, ytpre;
+LocalTransformation := function(y,s,t, YtoX,k)
+  local wyinv, wyt, l, ypre, ytpre;
   ypre := YtoX[y]; #preimages
   ytpre := YtoX[OnPoints(y,t)];
-  k := Maximum(Size(ypre), Size(ytpre)); #adjust for the bigger context
-  l := [1..k]; #we need to prefill the action with identities
+  #k := Maximum(Size(ypre), Size(ytpre)); #adjust for the bigger context
+  l := ListWithIdenticalEntries(k,k);
+  #l := [1..k]; #we need to prefill the action with identities
   wyinv := Winv(ypre);
   wyt := W(ytpre);
   Perform([1..Size(ypre)],
@@ -186,16 +187,17 @@ end;
 
 # creating a cascade for s when lifted to t
 MuLift := function(s,t,theta,n)
-  local y, cs, deps, nt, YtoX, preimgs;
+  local y, cs, deps, nt, YtoX, preimgs,k;
   YtoX := InvertHashMap(theta);
   deps := [];
+  k :=  Maximum(List(DistinctValueElements(theta), y -> Size(YtoX[y]))) +1;
   for y in DistinctValueElements(theta) do
-    nt := LocalTransformation(y,s,t, YtoX);
+    nt := LocalTransformation(y,s,t, YtoX,k);
     if not IsOne(nt) then
       Add(deps, [[y], nt]);
     fi;
   od;#y
-  return Cascade([n, Maximum(List(DistinctValueElements(theta), y -> Size(YtoX[y])))],
+  return Cascade([n,k],
                  Concatenation([[[], t]], deps));
 end;
 
