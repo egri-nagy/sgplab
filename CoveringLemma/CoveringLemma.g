@@ -33,6 +33,24 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
   return true;
 end;
 
+IsRelMorph := function(phi, Smul, Tmul)
+  local s1,s2,
+        inS, inT; #where is the action computed
+  for s1 in Keys(phi) do
+    for s2 in Keys(phi) do
+      inS := phi[Smul(s1,s2)];
+      inT := ElementwiseProduct(phi[s1], phi[s2], Tmul);
+      if not (IsSubset(inS, inT)) then
+        Print("Checking ", s1, "*", s2, "\n"); #TODO: use Info once in SgpDec
+        Print(inT, " is not a subset of ", inS, "\n");
+        return false;
+      fi;
+    od;
+  od;
+  return true;
+end;
+
+
 ### CREATING A SURJECTIVE MORPHISM, constructing theta and phi - the default method
 
 # STATES: subsets of the state set missing one point
