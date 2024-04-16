@@ -31,10 +31,10 @@ end;
 ### THE MAIN FUNCTION TO CALL
 StateCongruenceBySeed := function(S, seed)
   local n, partition, m, gens, collapsible;
-  n := DegreeOfTransformationSemigroup(S);
+  n := DegreeOfTransformationCollection(S);
   partition := Concatenation([seed], List(Difference([1..n], seed), x->[x]));
   Perform(partition, Sort); #ugly but ok
-  gens := Generators(S);
+  gens := S;#Generators(S);
   repeat
     m := ReverseLookup(partition);
     collapsible := TryToCollapse(partition, m, gens);
