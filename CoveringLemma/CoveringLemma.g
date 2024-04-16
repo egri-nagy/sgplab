@@ -3,7 +3,7 @@
 # using hash-maps for representing relations
 Read("hashmap.g");
 
-## RELATIONAL MORPHISMS ##############################################
+### RELATIONAL MORPHISMS #######################################################
 
 # to apply a binary operation for all ordered pairs for set A and B
 # meant to be used in relational morphisms, only distinct elements returned
@@ -50,12 +50,12 @@ IsRelMorph := function(phi, Smul, Tmul)
   return true;
 end;
 
-
-### CREATING A SURJECTIVE MORPHISM, constructing theta and phi - the default method
+### CREATING A SURJECTIVE MORPHISM, constructing theta and phi #################
 
 # STATES: subsets of the state set missing one point
 # creates a relation on states for the full transformation semigroup
 # a state goes to a set of all states except itself
+# the n(n-1) - slowest decomposition method
 ThetaForDegree := function(n) #we only need the number of states, the degree
   return HashMap(List([1..n],
                       x -> [x, Difference([1..n],[x])]));
@@ -64,29 +64,33 @@ end;
 # TRANSFORMATIONS: permutations or constant maps
 
 # deciding whether a transformation is actually a permutation
-# note: IsPerm is about the type of the object
+# note: IsPerm is about the type of the object, not what it is doing
 IsPermutation := function(t)
-  return DegreeOfTransformation(t)
+  return DegreeOfTransformation(t) #this seems to be computed by max moved point
          =
          Size(AsSet(ImageListOfTransformation(t)));
 end;
 
+# mapping s to phi(s) - a transformation to a set of transformations
 # if it is a permutation, then the image is the same,
 # otherwise to a set of constant maps to points not in the image
+# the degree of transformation given by n
+PhiPermutationResets := function(s,n)
+  if IsPermutation(s) then
+    return [s]; # still a set, but a singleton
+  else
+    # warning: giving n to ImageListOfTransformation is crucial here!
+    # otherwise, we may add constant maps for the ignored highest fixed point(s)
+    return List(Difference([1..n],AsSet(ImageListOfTransformation(s,n))),
+                x -> ConstantTransformation(n,x));
+  fi;
+end;
+
+# complementing ThetaForDegree
 PhiForTransformationSemigroup := function(S)
-  local f,n;
+  local n;
   n := DegreeOfTransformationSemigroup(S);
-  f := function(s)
-    if IsPermutation(s) then
-      return [s]; # still a set, but a singleton
-    else
-      # warning: giving n to ImageListOfTransformation is crucial here!
-      # otherwise, we may add constant maps for the ignored highest fixed point(s)
-      return List(Difference([1..n],AsSet(ImageListOfTransformation(s,n))),
-                  x -> ConstantTransformation(n,x));
-    fi;
-  end;
-  return HashMap(List(S, s -> [s, f(s)]));
+  return HashMap(List(S, s -> [s, PhiPermutationResets(s,n)]));
 end;
 
 ### BUILDING THE EMULATION constructing psi and mu ##############################
@@ -204,7 +208,7 @@ end;
 Mu := function(theta, phi)
   local mu, t, y, s, cs, deps, nt, n;
   n := Size(DistinctValueElements(theta)); # #states of top level
-  mu := HashMap();#EmptyClone(phi);
+  mu := HashMap();
   for s in Keys(phi) do
     mu[s] := MuFunc(s, phi[s], theta,n);
   od;#s
@@ -213,7 +217,7 @@ end;
 
 #returns a transformation in S
 MuInvFunc := function(cs, theta)
-  local y, wy,t,u,wytinv, thetainv,x, m,xs,n,l;
+  local y, wy,t,u,wytinv, thetainv,x, m,xs,n;
   thetainv := InvertHashMap(theta);
   m := HashMap();
   n := Size(Keys(theta)); # |X|
@@ -233,16 +237,11 @@ MuInvFunc := function(cs, theta)
       fi;
     od;
   od;
-  l := List([1..n], function(i)
-             if IsBound(m[i]) then
-               return m[i];
-             else
-               return i;
-             fi; end);
-  #     Print(l, "\n");
-  return Transformation(l);
+  return Transformation(List([1..n], i -> m[i]));
 end;
 
+# checks whether the emulation composed with interpretation IE
+# is the identity on S
 MuCheck := function(theta, phi)
   local s, lifts,n,css, cs,ss;
   n := Size(DistinctValueElements(theta)); # |Y|

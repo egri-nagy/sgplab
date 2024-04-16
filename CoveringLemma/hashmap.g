@@ -67,12 +67,6 @@ HashMapGraph := function(rel)
                                       v -> [k,v])));
 end;
 
-# creates a new set-valued hashmap using the same keys but with empty value sets
-EmptyClone := function(hashmap)
-  return HashMap(List(Keys(hashmap),
-                      key -> [key, []]));
-end;
-
 # just a quick check for hashmap equality
 # it may miss list equality for values (if not sorted)
 HashMapEq := function(m1, m2)
