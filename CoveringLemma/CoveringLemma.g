@@ -205,7 +205,7 @@ MuFunc := function(s, ts, theta, n)
   return List(ts, t-> MuLift(s,t,theta, n));
 end;
 
-# the complet map from S to the cascade product
+# the complete map from S to the cascade product
 # just lift every s with respect to all of its lifts
 Mu := function(theta, phi)
   local mu, t, y, s, cs, deps, nt, n;
