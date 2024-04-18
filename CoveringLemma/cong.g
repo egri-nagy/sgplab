@@ -1,27 +1,33 @@
-### creating congruences on X for (X,S)
+### creating congruences on X for (X,S) for a surjective homomorphism
 # the algorithm is similar to the classical DFA minimization
 
 #gives classes to be merged if needed, if everything checks, then return empty list
-#going through all classes and generators
-TryToCollapse := function(eqcls, lookup, gens)
+#going through all classes and generators gens
+# eqcls - the equivalence classes so far
+# lookup takes a point to its current equivalence class
+ClassesToBeMerged := function(eqcls, lookup, gens)
   local g, eqcl, result;
   for g in gens do
     for eqcl in eqcls do
       result := AsSet(List(eqcl, x -> lookup[OnPoints(x,g)]));
-      if Size(result) > 1 then return result; fi;
+      if Size(result) > 1 then #some points in eqcl went to different classes
+        return result;
+      fi;
     od;
   od;
-  return [];
+  return []; #all checks, nothing to merge
 end;
 
 # given a partition and classes to be merged, it returns a new partiton
 # with merged classes
-# DANGER we silently assume the classes are ordered
+# removes the ones to be merged and adds their union
+# DANGER we assume the classes are ordered, but Union silently applies Set
 MergeClasses := function(partition, tomerge)
-  return Concatenation(Difference(partition, tomerge), [Union(tomerge)]);
+  return Concatenation(Difference(partition, tomerge),
+                       [Union(tomerge)]);
 end;
 
-#gives a lookup for an element to the class it belongs to
+#gives a lookup for a point to the class it belongs to
 ReverseLookup := function(partition)
   return HashMap(Concatenation(List(partition,
                                     eqcl -> List(eqcl,
@@ -37,7 +43,7 @@ StateCongruenceBySeed := function(S, seed)
   gens := S;#Generators(S);
   repeat
     m := ReverseLookup(partition);
-    collapsible := TryToCollapse(partition, m, gens);
+    collapsible := ClassesToBeMerged(partition, m, gens);
     if not(IsEmpty(collapsible)) then
       partition := MergeClasses(partition, collapsible);
     fi;
