@@ -36,9 +36,13 @@ ReverseLookup := function(partition)
 end;
 
 ### THE MAIN FUNCTION TO CALL
-StateCongruenceBySeed := function(gens, seeds)
+# Returns the coarsest congruence, in which the given seed sets are inside
+# equivalence classes.
+# seeds: disjoint sets of states
+# gens: transformations, typically generators of the ts
+StateSetCongruence := function(gens, seeds)
   local n, partition, m, collapsible;
-  n := DegreeOfTransformationCollection(S);
+  n := DegreeOfTransformationCollection(gens);
   partition := Concatenation(seeds, List(Difference([1..n], Union(seeds)), x->[x]));
   Perform(partition, Sort); #ugly but ok
   repeat
