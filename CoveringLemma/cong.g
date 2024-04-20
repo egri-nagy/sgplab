@@ -1,8 +1,9 @@
 ### creating congruences on X for (X,S) for a surjective homomorphism
 # the algorithm is similar to the classical DFA minimization
 
-#gives classes to be merged if needed, if everything checks, then return empty list
-#going through all classes and generators gens
+# Gives classes to be merged if needed, if everything checks, then it returns
+# the empty list. Going through all classes and generators gens, but immediately
+# returning the first found classes to be merged.
 # eqcls - the equivalence classes so far
 # lookup takes a point to its current equivalence class
 ClassesToBeMerged := function(eqcls, lookup, gens)
@@ -35,12 +36,11 @@ ReverseLookup := function(partition)
 end;
 
 ### THE MAIN FUNCTION TO CALL
-StateCongruenceBySeed := function(S, seed)
-  local n, partition, m, gens, collapsible;
+StateCongruenceBySeed := function(gens, seeds)
+  local n, partition, m, collapsible;
   n := DegreeOfTransformationCollection(S);
-  partition := Concatenation([seed], List(Difference([1..n], seed), x->[x]));
+  partition := Concatenation(seeds, List(Difference([1..n], Union(seeds)), x->[x]));
   Perform(partition, Sort); #ugly but ok
-  gens := S;#Generators(S);
   repeat
     m := ReverseLookup(partition);
     collapsible := ClassesToBeMerged(partition, m, gens);
