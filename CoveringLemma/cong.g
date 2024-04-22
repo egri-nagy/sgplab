@@ -75,4 +75,13 @@ CongPhi := function(partition, S)
                                                                      rl[First(OnSets(eqcl,s))])))]]));
 end;
 
-
+FishForInterestingExamples := function()
+  local S, partition;
+  while (true) do
+    S := (RandomSemigroup(IsTransformationSemigroup,2,13));
+    pt:=StateSetCongruence(Generators(S), [[1,2],[3,4]]);
+    if (5 <= Size(Filtered(pt, A -> Size(A) > 1))) then
+      Print(Generators(S), " ", pt, "\n");
+    fi;
+  od;
+end;
