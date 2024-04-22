@@ -54,7 +54,7 @@ end;
 
 # STATES: subsets of the state set missing one point
 # creates a relation on states for the full transformation semigroup
-# a state goes to a set of all states except itself
+# a state goes to a set of all states except itself, self-inverse theta
 # the n(n-1) - slowest decomposition method
 ThetaForDegree := function(n) #we only need the number of states, the degree
   return HashMap(List([1..n],
