@@ -32,7 +32,7 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
         Print(inT, " is not a subset of ", inS, "\n");
         return false;
       fi;
-    od;i
+    od;
   od;
   return true;
 end;
@@ -356,4 +356,24 @@ return Filtered(Idempotents(S),
                 e -> IsRelationalMorphism(LocalTheta([1..DegreeOfTransformationSemigroup(S)],e),
                                           LocalPhi(S, e),
                                           OnPoints, OnPoints));
+end;
+
+### computing the Uys
+
+Staby := function(phi,y)
+local phiinv, ts;
+  phiinv := InvertHashMap(phi);
+  ts := Filtered(Keys(phiinv), t -> y = OnPoints(y,t));
+  return AsSet(Concatenation(List(ts, t-> phiinv[t])));
+end;
+
+#for now, only for fully calculated ones
+Uy := function(theta, phi, y)
+  local wy, wyinv, thetainv,k;
+  thetainv := InvertHashMap(theta);
+  k := Size(thetainv[y]);
+  wy := W(thetainv[y]);
+  wyinv := Winv(thetainv[y]);
+  return AsSet(List(Staby(phi,y), s -> List([1..k],
+                                  i -> wy(OnPoints(wyinv(i),s)))));
 end;
