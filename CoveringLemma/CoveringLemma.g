@@ -1,6 +1,9 @@
-# working on the covering Lemma algorithm
+# Implementing the Covering Lemma as described in https://arxiv.org/abs/2404.11923
 
-# using hash-maps for representing relations
+# Design decision: using hash-maps for representing relations
+# Hash-maps were used for experimental code, but they are flexible enough to
+# be the main tool. It's easy to get the keys, and they allow partial
+# representations.
 Read("hashmap.g");
 
 ### RELATIONAL MORPHISMS #######################################################
@@ -16,6 +19,7 @@ end;
 # theta: for states, hashmap from X to subsets of Y
 # phi: for transformations, hashmap from S to subsets of T
 # Sact, Tact: functions for the actions in the ts's, e.g., OnPoints
+# TODO think about a record for all these four items, representing a relationa morphism
 IsRelationalMorphism := function(theta, phi, Sact, Tact)
   local x,s,
         inS, inT; #where is the action computed
@@ -28,11 +32,12 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
         Print(inT, " is not a subset of ", inS, "\n");
         return false;
       fi;
-    od;
+    od;i
   od;
   return true;
 end;
 
+# only for semigroups, not transformation semigroups
 IsRelMorph := function(phi, Smul, Tmul)
   local s1,s2,
         inS, inT; #where is the action computed
@@ -201,6 +206,7 @@ MuLift := function(s,t,theta,n)
                  Concatenation([[[], t]], deps));
 end;
 
+# needed for MuCheck
 MuFunc := function(s, ts, theta, n)
   return List(ts, t-> MuLift(s,t,theta, n));
 end;
