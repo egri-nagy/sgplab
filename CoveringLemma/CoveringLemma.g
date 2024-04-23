@@ -359,11 +359,13 @@ return Filtered(Idempotents(S),
 end;
 
 ### computing the Uys
-
+#all the s in S such that its image t fixes y
+#for now this is a very expensive operation
 Staby := function(phi,y)
 local phiinv, ts;
   phiinv := InvertHashMap(phi);
-  ts := Filtered(Keys(phiinv), t -> y = OnPoints(y,t));
+  ts := Filtered(Keys(phiinv),
+                 t -> y = OnPoints(y,t));
   return AsSet(Concatenation(List(ts, t-> phiinv[t])));
 end;
 
