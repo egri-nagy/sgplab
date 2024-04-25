@@ -176,9 +176,7 @@ LocalTransformation := function(y,s,t, YtoX,k)
   local wyinv, wyt, l, ypre, ytpre;
   ypre := YtoX[y]; #preimages
   ytpre := YtoX[OnPoints(y,t)];
-  #k := Maximum(Size(ypre), Size(ytpre)); #adjust for the bigger context
-  l := ListWithIdenticalEntries(k,k);
-  #l := [1..k]; #we need to prefill the action with identities
+  l := [1..k]; #we need to prefill the action with identities
   wyinv := Winv(ypre);
   wyt := W(ytpre);
   Perform([1..Size(ypre)],
@@ -195,7 +193,7 @@ MuLift := function(s,t,theta,n)
   local y, cs, deps, nt, YtoX, preimgs,k;
   YtoX := InvertHashMap(theta);
   deps := [];
-  k :=  Maximum(List(DistinctValueElements(theta), y -> Size(YtoX[y]))) +1;
+  k :=  Maximum(List(DistinctValueElements(theta), y -> Size(YtoX[y])));
   for y in DistinctValueElements(theta) do
     nt := LocalTransformation(y,s,t, YtoX,k);
     if not IsOne(nt) then
