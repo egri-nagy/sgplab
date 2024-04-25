@@ -1,6 +1,7 @@
 # Added functionality to HashMap from the datastructures package.
 
-# given a set-valued hashmap m this returns all the distince elements from
+
+# given a set-valued hashmap m this returns all the distinct elements from
 # all image sets
 DistinctValueElements := function(m)
   return AsSet(Concatenation(AsSet(Values(m))));
