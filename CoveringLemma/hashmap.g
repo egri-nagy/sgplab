@@ -1,21 +1,24 @@
-# Added functionality to HashMap from the datastructures package.
+# Relations represented as set-valued hash-maps, using the HashMap
+# from the datastructures package.
+# The only extra assumption is that the values are collections (sets).
+# Naming: HashMapRelation is a relation represented by a set-valued HashMap.
+# generic variable name: hmr
 
-
-# given a set-valued hashmap m this returns all the distinct elements from
+# given a relation hmr this returns all the distinct elements from
 # all image sets
-DistinctValueElements := function(m)
-  return AsSet(Concatenation(AsSet(Values(m))));
+ImageOfHashMapRelation := function(hmr)
+  return AsSet(Concatenation(AsSet(Values(hmr))));
 end;
 
 # turning around a hashmap
-InvertHashMap := function(rel)
+InvertHashMapRelation := function(hmr)
   local m;
   #putting in all values as keys with empty value set for now
-  m := HashMap(List(DistinctValueElements(rel),
+  m := HashMap(List(ImageOfHashMapRelation(hmr),
                     x -> [x,[]]));
-  Perform(Keys(rel),
+  Perform(Keys(hmr),
          function(k)
-           Perform(rel[k], #we put all related elements into the mutable lists
+           Perform(hmr[k], #we put all related elements into the mutable lists
                   function(v)
                     AddSet(m[v], k);
                   end);
@@ -25,7 +28,7 @@ end;
 
 # it is injective if the inverse has singletons, i.e. the preimages are singletons
 IsInjectiveHashMap := function(rel)
-  return ForAll(Values(InvertHashMap(rel)), coll -> Size(coll) = 1);
+  return ForAll(Values(InvertHashMapRelation(rel)), coll -> Size(coll) = 1);
 end;
 
 #doing it a bit more efficiently, to see if there is any overlap between the image

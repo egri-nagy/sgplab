@@ -65,8 +65,8 @@ Print(IsRelationalMorphism(Psi(ex4theta),
                            OnCoordinates));
 
 # and back, from the cascade to the original
-Print(IsRelationalMorphism(InvertHashMap(Psi(ex4theta)),
-                           InvertHashMap(Mu(ex4theta, ex4phi)),
+Print(IsRelationalMorphism(InvertHashMapRelation(Psi(ex4theta)),
+                           InvertHashMapRelation(Mu(ex4theta, ex4phi)),
                            OnCoordinates,
                            OnPoints),"\n");
 
@@ -78,8 +78,8 @@ Print(IsRelationalMorphism(Psi(ex5theta),
                            OnPoints,
                            OnCoordinates));
 
-Print(IsRelationalMorphism(InvertHashMap(Psi(ex5theta)),
-                           InvertHashMap(Mu(ex5theta, ex5phi)),
+Print(IsRelationalMorphism(InvertHashMapRelation(Psi(ex5theta)),
+                           InvertHashMapRelation(Mu(ex5theta, ex5phi)),
                            OnCoordinates,
                            OnPoints));
 

@@ -140,7 +140,7 @@ end;
 Psi := function(theta)
   local x,YtoX, psi;
   psi := HashMap();
-  YtoX := InvertHashMap(theta);
+  YtoX := InvertHashMapRelation(theta);
   for x in Keys(theta) do
       psi[x] := PsiFunc(x, theta, YtoX);
   od;
@@ -159,7 +159,7 @@ end;
 
 PsiCheck := function(theta)
   local x, thetainv;
-  thetainv := InvertHashMap(theta);
+  thetainv := InvertHashMapRelation(theta);
   for x in Keys(theta) do
     if not (ForAll(PsiFunc(x, theta, thetainv),
                    coordpair -> x = PsiInvFunc(coordpair, thetainv))) then
@@ -191,10 +191,10 @@ end;
 # creating a cascade for s when lifted to t
 MuLift := function(s,t,theta,n)
   local y, cs, deps, nt, YtoX, preimgs,k;
-  YtoX := InvertHashMap(theta);
+  YtoX := InvertHashMapRelation(theta);
   deps := [];
-  k :=  Maximum(List(DistinctValueElements(theta), y -> Size(YtoX[y])));
-  for y in DistinctValueElements(theta) do
+  k :=  Maximum(List(ImageOfHashMapRelation(theta), y -> Size(YtoX[y])));
+  for y in ImageOfHashMapRelation(theta) do
     nt := LocalTransformation(y,s,t, YtoX,k);
     if not IsOne(nt) then
       Add(deps, [[y], nt]);
@@ -213,7 +213,7 @@ end;
 # just lift every s with respect to all of its lifts
 Mu := function(theta, phi)
   local mu, t, y, s, cs, deps, nt, n;
-  n := Size(DistinctValueElements(theta)); # #states of top level
+  n := Size(ImageOfHashMapRelation(theta)); # #states of top level
   mu := HashMap();
   for s in Keys(phi) do
     mu[s] := MuFunc(s, phi[s], theta,n);
@@ -224,10 +224,10 @@ end;
 #returns a transformation in S
 MuInvFunc := function(cs, theta)
   local y, wy,t,u,wytinv, thetainv,x, m,xs,n;
-  thetainv := InvertHashMap(theta);
+  thetainv := InvertHashMapRelation(theta);
   m := HashMap();
   n := Size(Keys(theta)); # |X|
-  for y in DistinctValueElements(theta) do
+  for y in ImageOfHashMapRelation(theta) do
     wy := W(thetainv[y]);
     t := OnDepArg([], DependencyFunctionsOf(cs)[1]);
     wytinv := Winv(thetainv[OnPoints(y,t)]);
@@ -250,7 +250,7 @@ end;
 # is the identity on S
 MuCheck := function(theta, phi)
   local s, lifts,n,css, cs,ss;
-  n := Size(DistinctValueElements(theta)); # |Y|
+  n := Size(ImageOfHashMapRelation(theta)); # |Y|
   for s in Keys(phi) do
     css := MuFunc(s, phi[s], theta, n);
     for cs in css do
@@ -278,12 +278,12 @@ TestEmulationWithMorphism := function(S,theta, phi)
         IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
         "\n");
   Print("Interpretation works? ",
-        IsRelationalMorphism(InvertHashMap(psi),
-                             InvertHashMap(mu),
+        IsRelationalMorphism(InvertHashMapRelation(psi),
+                             InvertHashMapRelation(mu),
                              OnCoordinates,
                              OnPoints),
         "\n");
-  lifts := DistinctValueElements(mu);
+  lifts := ImageOfHashMapRelation(mu);
   #the size calculation might be heavy for bigger cascade products
   Print("|S|=", Size(S), " -> (",
         Size(lifts) , ",",
@@ -361,7 +361,7 @@ end;
 #for now this is a very expensive operation
 Staby := function(phi,y)
 local phiinv, ts;
-  phiinv := InvertHashMap(phi);
+  phiinv := InvertHashMapRelation(phi);
   ts := Filtered(Keys(phiinv),
                  t -> y = OnPoints(y,t));
   return AsSet(Concatenation(List(ts, t-> phiinv[t])));
@@ -370,7 +370,7 @@ end;
 #for now, only for fully calculated ones
 Uy := function(theta, phi, y)
   local wy, wyinv, thetainv,k;
-  thetainv := InvertHashMap(theta);
+  thetainv := InvertHashMapRelation(theta);
   k := Size(thetainv[y]);
   wy := W(thetainv[y]);
   wyinv := Winv(thetainv[y]);
