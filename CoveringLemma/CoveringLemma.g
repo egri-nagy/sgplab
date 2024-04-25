@@ -176,7 +176,7 @@ LocalTransformation := function(y,s,t, YtoX,k)
   local wyinv, wyt, l, ypre, ytpre;
   ypre := YtoX[y]; #preimages
   ytpre := YtoX[OnPoints(y,t)];
-  l := [1..k]; #we need to prefill the action with identities
+  l := [1..k]; #we need to prefill the action with identities, |ypre| may not equal |ytpre|
   wyinv := Winv(ypre);
   wyt := W(ytpre);
   Perform([1..Size(ypre)],
