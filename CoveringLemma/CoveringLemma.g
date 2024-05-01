@@ -22,7 +22,7 @@ end;
 # phi: for transformations, hashmap from S to subsets of T
 # Sact, Tact: functions for the actions in the ts's, e.g., OnPoints
 # TODO think about a record for all these four items
-IsRelationalMorphism := function(theta, phi, Sact, Tact)
+IsTSRelMorph := function(theta, phi, Sact, Tact)
   local x,s,
         inS, inT; #where is the action computed
   for x in Keys(theta) do
@@ -273,17 +273,17 @@ TestEmulationWithMorphism := function(S,theta, phi)
   local psi, mu, lifts;
   #1st to double check that we have a relational morphism
   Print("Surjective morphism works? ",
-        IsRelationalMorphism(theta, phi, OnPoints, OnPoints),
+        IsTSRelMorph(theta, phi, OnPoints, OnPoints),
         "\n");
   #now creating the coordinatized version
   psi := Psi(theta);
   mu := Mu(theta, phi);
   # Can the cascade emulation the original
   Print("Emulation works? ",
-        IsRelationalMorphism(psi, mu, OnPoints, OnCoordinates),
+        IsTSRelMorph(psi, mu, OnPoints, OnCoordinates),
         "\n");
   Print("Interpretation works? ",
-        IsRelationalMorphism(InvertHashMapRelation(psi),
+        IsTSRelMorph(InvertHashMapRelation(psi),
                              InvertHashMapRelation(mu),
                              OnCoordinates,
                              OnPoints),
@@ -356,7 +356,7 @@ end;
 #it is a rare property - mostly just the identity or constant maps
 TestForMorphicLocalMonoid := function(S)
 return Filtered(Idempotents(S),
-                e -> IsRelationalMorphism(LocalTheta([1..DegreeOfTransformationSemigroup(S)],e),
+                e -> IsTSRelMorph(LocalTheta([1..DegreeOfTransformationSemigroup(S)],e),
                                           LocalPhi(S, e),
                                           OnPoints, OnPoints));
 end;

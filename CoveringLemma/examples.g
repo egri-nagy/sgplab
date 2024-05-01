@@ -32,7 +32,7 @@ ex2phi := HashMap([[Transformation([1,2]), [Transformation([1,2])]],
                    [Transformation([2,2]), [Transformation([2,2])]],
                    [Transformation([1,1]), [Transformation([1,1])]]]);
 
-if not(IsRelationalMorphism(ex2theta, ex2phi, OnPoints, OnPoints)) then
+if not(IsTSRelMorph(ex2theta, ex2phi, OnPoints, OnPoints)) then
   Display("Example 2 OK");
 else
   Error("Example 2");
@@ -43,7 +43,7 @@ fi;
 ex3theta := HashMap(List([1,2,3], x-> [x,[x]]));
 ex3phi := HashMap(List(FullTransformationSemigroup(3), s-> [s,[s]]));
 
-if IsRelationalMorphism(ex3theta, ex3phi, OnPoints, OnPoints) then
+if IsTSRelMorph(ex3theta, ex3phi, OnPoints, OnPoints) then
   Display("Example 3 OK");
 else
   Error("Example 3");
@@ -56,16 +56,16 @@ ex4theta := ThetaForDegree(3);
 ex4phi := PhiForTransformationSemigroup(FullTransformationSemigroup(3));
 
 #is it a relational morphism
-Print(IsRelationalMorphism(ex4theta, ex4phi, OnPoints, OnPoints));
+Print(IsTSRelMorph(ex4theta, ex4phi, OnPoints, OnPoints));
 
 #checking the morphism into the coordinatized form
-Print(IsRelationalMorphism(Psi(ex4theta),
+Print(IsTSRelMorph(Psi(ex4theta),
                            Mu(ex4theta, ex4phi),
                            OnPoints,
                            OnCoordinates));
 
 # and back, from the cascade to the original
-Print(IsRelationalMorphism(InvertHashMapRelation(Psi(ex4theta)),
+Print(IsTSRelMorph(InvertHashMapRelation(Psi(ex4theta)),
                            InvertHashMapRelation(Mu(ex4theta, ex4phi)),
                            OnCoordinates,
                            OnPoints),"\n");
@@ -73,19 +73,19 @@ Print(IsRelationalMorphism(InvertHashMapRelation(Psi(ex4theta)),
 
 ex5theta := ThetaForDegree(5);
 ex5phi := PhiForTransformationSemigroup(FullTransformationSemigroup(5));
-Print(IsRelationalMorphism(Psi(ex5theta),
+Print(IsTSRelMorph(Psi(ex5theta),
                            Mu(ex5theta, ex5phi),
                            OnPoints,
                            OnCoordinates));
 
-Print(IsRelationalMorphism(InvertHashMapRelation(Psi(ex5theta)),
+Print(IsTSRelMorph(InvertHashMapRelation(Psi(ex5theta)),
                            InvertHashMapRelation(Mu(ex5theta, ex5phi)),
                            OnCoordinates,
                            OnPoints));
 
 
 S := RandomSemigroup(IsTransformationSemigroup, 3,5);
-Print(IsRelationalMorphism(Psi(ThetaForDegree(5)), Mu(ThetaForDegree(5),PhiForTransformationSemigroup(S)), OnPoints, OnCoordinates));
+Print(IsTSRelMorph(Psi(ThetaForDegree(5)), Mu(ThetaForDegree(5),PhiForTransformationSemigroup(S)), OnPoints, OnCoordinates));
 
 ##
 IdTheta := function(states)
