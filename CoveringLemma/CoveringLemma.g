@@ -2,24 +2,26 @@
 
 # Design decision: using hash-maps for representing relations
 # Hash-maps were used for experimental code, but they are flexible enough to
-# be the main tool. It's easy to get the keys, and they allow partial
-# representations.
+# be the main tool. It's easy to get the keys, and they allow partially
+# represented relational morphisms.
 Read("hashmap.g");
 
 ### RELATIONAL MORPHISMS #######################################################
 
-# to apply a binary operation for all ordered pairs for set A and B
-# meant to be used in relational morphisms, only distinct elements returned
+# Applying a binary operation for all ordered pairs for set A and B, and
+# returning the set of results.
 ElementwiseProduct := function(A, B, binop)
   return AsSet(List(EnumeratorOfCartesianProduct(A,B),
                     p -> binop(p[1],p[2])));
 end;
 
-# how to define a relational morphism? from (X,S) to (Y,T)?
+# Checking compatible actions for a trasnformation semigroup relational
+# morphism from (X,S) to (Y,T).
+# Aborts immediately and reports first incompatibility.
 # theta: for states, hashmap from X to subsets of Y
 # phi: for transformations, hashmap from S to subsets of T
 # Sact, Tact: functions for the actions in the ts's, e.g., OnPoints
-# TODO think about a record for all these four items, representing a relationa morphism
+# TODO think about a record for all these four items
 IsRelationalMorphism := function(theta, phi, Sact, Tact)
   local x,s,
         inS, inT; #where is the action computed
@@ -37,8 +39,11 @@ IsRelationalMorphism := function(theta, phi, Sact, Tact)
   return true;
 end;
 
-# only for semigroups, not transformation semigroups
-IsRelMorph := function(phi, Smul, Tmul)
+# Checking relational morphism S to T (only as semigroups, not transformation
+# semigroups). Aborts immediately and reports first incompatibility.
+# phi: hashmap from S to subsets of T
+# Smul, Tmul: multiplication operations in source and target semigroups
+IsSgpRelMorph := function(phi, Smul, Tmul)
   local s1,s2,
         inS, inT; #where is the action computed
   for s1 in Keys(phi) do
