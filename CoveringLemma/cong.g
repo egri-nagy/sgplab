@@ -52,36 +52,40 @@ StateSetCongruence := function(gens, seeds)
       partition := MergeClasses(partition, collapsible);
     fi;
   until IsEmpty(collapsible);
-  return partition;
+  #to guarantee that it is sorted
+  return AsSortedList(List(partition, eqcl -> AsSortedList(eqcl)));
 end;
 
 #### now the Covering Lemma stuff #####################################################
-CongTheta := function(partition)
-  local sorted,rl;
-  sorted := AsSortedList(List(partition, eqcl -> AsSortedList(eqcl)));
-  rl := ReverseLookup(sorted);
-  return HashMap(Concatenation(List(sorted,
-                                    eqcl -> List(eqcl,
-                                                 x -> [x, [Position(sorted, rl[x])]]))));
+ThetaFromCongruence := function(partition)
+  local rl, pairs;
+  rl := ReverseLookup(partition);
+  pairs := List(partition, #go through all equivalence classes
+                eqcl -> List(eqcl, #for all points we map them to their eqclass index
+                             x -> [x, [Position(partition, rl[x])]]));
+  return HashMap(Concatenation(pairs));
 end;
 
-CongPhi := function(partition, S)
-  local sorted,rl;
-  sorted := AsSortedList(List(partition, eqcl -> AsSortedList(eqcl)));
-  rl := ReverseLookup(sorted);
-  return HashMap(List(S,
-                      s -> [s, [Transformation(List(sorted,
-                                                    eqcl -> Position(sorted,
-                                                                     rl[First(OnSets(eqcl,s))])))]]));
+# S - set of transformations, not necessarily a semigroup
+PhiFromCongruence := function(partition, S)
+  local rl, congact;
+  rl := ReverseLookup(partition);
+  congact := function(s)
+    return Transformation(List(partition,
+                               eqcl ->
+                                    Position(partition,
+                                             rl[First(OnSets(eqcl,s))])));
+  end;
+  return HashMap(List(S, s ->[s, [congact(s)]]));
 end;
 
 FishForInterestingExamples := function()
   local S, partition;
   while (true) do
     S := (RandomSemigroup(IsTransformationSemigroup,2,13));
-    pt:=StateSetCongruence(Generators(S), [[1,2],[3,4]]);
-    if (5 <= Size(Filtered(pt, A -> Size(A) > 1))) then
-      Print(Generators(S), " ", pt, "\n");
+    partition :=StateSetCongruence(Generators(S), [[1,2],[3,4]]);
+    if (5 <= Size(Filtered(partition, A -> Size(A) > 1))) then
+      Print("S := Semigroup(",Generators(S), ");\n", partition, "\n");
     fi;
   od;
 end;
