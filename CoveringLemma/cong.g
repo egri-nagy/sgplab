@@ -84,8 +84,10 @@ FishForInterestingExamples := function()
   while (true) do
     S := (RandomSemigroup(IsTransformationSemigroup,2,13));
     partition :=StateSetCongruence(Generators(S), [[1,2],[3,4]]);
-    if (5 <= Size(Filtered(partition, A -> Size(A) > 1))) then
-      Print("S := Semigroup(",Generators(S), ");\n", Size(S), " ",partition, "\n");
+    if (5 > Size(partition))
+       and (2 < Size(partition))
+       and (3 <= Size(Filtered(partition, A -> Size(A) > 2))) then
+    Print("S := Semigroup(",Generators(S), ");\n", Size(S), " ",partition, "\n");
       DisplayHolonomyComponents(Skeleton(S));
     fi;
   od;

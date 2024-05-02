@@ -66,7 +66,7 @@ end;
 # creates a relation on states for the full transformation semigroup
 # a state goes to a set of all states except itself, self-inverse theta
 # the n(n-1) - slowest decomposition method
-ThetaForMissingOne := function(n) #we only need the number of states, the degree
+ThetaForPermutationResets := function(n) #we only need the number of states, the degree
   return HashMap(List([1..n],
                       x -> [x, Difference([1..n],[x])]));
 end;
@@ -96,7 +96,7 @@ PermutationOrResets := function(s,n)
   fi;
 end;
 
-# complementing ThetaForMissingOne
+# complementing ThetaForPermutationResets
 PhiForPermutationResets := function(S)
   local n;
   n := DegreeOfTransformationSemigroup(S);
@@ -177,11 +177,11 @@ end;
 # given the context y, the top level state, we want to know
 # how the original action of s can be expressed locally on Z
 # the element of U constructed here also depends on t
-LocalTransformation := function(y,s,t, YtoX,k)
+LocalTransformation := function(y,s,t, YtoX)
   local wyinv, wyt, l, ypre, ytpre;
   ypre := YtoX[y]; #preimages
   ytpre := YtoX[OnPoints(y,t)];
-  l := [1..k]; #we need to prefill the action with identities, |ypre| may not equal |ytpre|
+  l := [1..Maximum(Size(ypre),Size(ytpre))];#k]; #we need to prefill the action with identities, |ypre| may not equal |ytpre|
   wyinv := Winv(ypre);
   wyt := W(ytpre);
   Perform([1..Size(ypre)],
@@ -200,7 +200,7 @@ MuLift := function(s,t,theta,n)
   deps := [];
   k :=  Maximum(List(ImageOfHashMapRelation(theta), y -> Size(YtoX[y])));
   for y in ImageOfHashMapRelation(theta) do
-    nt := LocalTransformation(y,s,t, YtoX,k);
+    nt := LocalTransformation(y,s,t, YtoX);
     if not IsOne(nt) then
       Add(deps, [[y], nt]);
     fi;
@@ -302,13 +302,13 @@ TestEmulation := function(S)
 local n, theta, phi;
   n := DegreeOfTransformationSemigroup(S);
   #the standard covering map described in the Covering Lemma paper
-  theta := ThetaForMissingOne(n);
+  theta := ThetaForPermutationResets(n);
   phi := PhiForPermutationResets(S);
   TestEmulationWithMorphism(S, theta, phi);
 end;
 
 #WIP
-ThetaFromHolonomy := function(sk)
+ThetaForHolonomy := function(sk)
 local theta;
   theta := HashMap();
   Perform([1..DegreeOfSkeleton(sk)],
@@ -335,29 +335,31 @@ local phi;
 end;
 
 ####### extreme collapsing
-CollapsingTheta := function(states)
+#evertyhing goes to state 1
+ThetaForConstant := function(states)
   return HashMap(List(states, x-> [x,[1]]));
 end;
 
-CollapsingPhi := function(transformations)
+#everyting goes to the identity
+PhiForConstant := function(transformations)
   return HashMap(List(transformations, s-> [s,[IdentityTransformation]]));
 end;
 
 
 ##### local transformation monoid by idempotent e #############################
-LocalTheta := function(states, e)
+ThetaForLocalMonoid := function(states, e)
   return HashMap(List(states, x-> [x,[OnPoints(x,e)]]));
 end;
 
-LocalPhi := function(transformations, e)
+PhiForLocalMonoid := function(transformations, e)
   return HashMap(List(transformations, s-> [s,[e*s*e]]));
 end;
 
 #it is a rare property - mostly just the identity or constant maps
 TestForMorphicLocalMonoid := function(S)
 return Filtered(Idempotents(S),
-                e -> IsTSRelMorph(LocalTheta([1..DegreeOfTransformationSemigroup(S)],e),
-                                          LocalPhi(S, e),
+                e -> IsTSRelMorph(ThetaForLocalMonoid([1..DegreeOfTransformationSemigroup(S)],e),
+                                          PhiForLocalMonoid(S, e),
                                           OnPoints, OnPoints));
 end;
 

@@ -52,7 +52,7 @@ fi;
 ### FULL TRANSFORMATION SEMIGROUPS #######################
 # T3 to T2 Zeiger encoding
 
-ex4theta := ThetaForMissingOne(3);
+ex4theta := ThetaForPermutationResets(3);
 ex4phi := PhiForPermutationResets(FullTransformationSemigroup(3));
 
 #is it a relational morphism
@@ -71,7 +71,7 @@ Print(IsTSRelMorph(InvertHashMapRelation(Psi(ex4theta)),
                            OnPoints),"\n");
 
 
-ex5theta := ThetaForMissingOne(5);
+ex5theta := ThetaForPermutationResets(5);
 ex5phi := PhiForPermutationResets(FullTransformationSemigroup(5));
 Print(IsTSRelMorph(Psi(ex5theta),
                            Mu(ex5theta, ex5phi),
@@ -85,7 +85,7 @@ Print(IsTSRelMorph(InvertHashMapRelation(Psi(ex5theta)),
 
 
 S := RandomSemigroup(IsTransformationSemigroup, 3,5);
-Print(IsTSRelMorph(Psi(ThetaForMissingOne(5)), Mu(ThetaForMissingOne(5),PhiForPermutationResets(S)), OnPoints, OnCoordinates));
+Print(IsTSRelMorph(Psi(ThetaForPermutationResets(5)), Mu(ThetaForPermutationResets(5),PhiForPermutationResets(S)), OnPoints, OnCoordinates));
 
 ##
 IdTheta := function(states)
