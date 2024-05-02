@@ -66,7 +66,7 @@ end;
 # creates a relation on states for the full transformation semigroup
 # a state goes to a set of all states except itself, self-inverse theta
 # the n(n-1) - slowest decomposition method
-ThetaForDegree := function(n) #we only need the number of states, the degree
+ThetaForMissingOne := function(n) #we only need the number of states, the degree
   return HashMap(List([1..n],
                       x -> [x, Difference([1..n],[x])]));
 end;
@@ -85,7 +85,7 @@ end;
 # if it is a permutation, then the image is the same,
 # otherwise to a set of constant maps to points not in the image
 # the degree of transformation given by n
-PhiPermutationResets := function(s,n)
+PermutationOrResets := function(s,n)
   if IsPermutation(s) then
     return [s]; # still a set, but a singleton
   else
@@ -96,11 +96,11 @@ PhiPermutationResets := function(s,n)
   fi;
 end;
 
-# complementing ThetaForDegree
-PhiForTransformationSemigroup := function(S)
+# complementing ThetaForMissingOne
+PhiForPermutationResets := function(S)
   local n;
   n := DegreeOfTransformationSemigroup(S);
-  return HashMap(List(S, s -> [s, PhiPermutationResets(s,n)]));
+  return HashMap(List(S, s -> [s, PermutationOrResets(s,n)]));
 end;
 
 ### BUILDING THE EMULATION constructing psi and mu ##############################
@@ -302,8 +302,8 @@ TestEmulation := function(S)
 local n, theta, phi;
   n := DegreeOfTransformationSemigroup(S);
   #the standard covering map described in the Covering Lemma paper
-  theta := ThetaForDegree(n);
-  phi := PhiForTransformationSemigroup(S);
+  theta := ThetaForMissingOne(n);
+  phi := PhiForPermutationResets(S);
   TestEmulationWithMorphism(S, theta, phi);
 end;
 

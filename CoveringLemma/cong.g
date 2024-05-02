@@ -57,7 +57,7 @@ StateSetCongruence := function(gens, seeds)
 end;
 
 #### now the Covering Lemma stuff #####################################################
-ThetaFromCongruence := function(partition)
+ThetaForCongruence := function(partition)
   local rl, pairs;
   rl := ReverseLookup(partition);
   pairs := List(partition, #go through all equivalence classes
@@ -67,7 +67,7 @@ ThetaFromCongruence := function(partition)
 end;
 
 # S - set of transformations, not necessarily a semigroup
-PhiFromCongruence := function(partition, S)
+PhiForCongruence := function(partition, S)
   local rl, congact;
   rl := ReverseLookup(partition);
   congact := function(s)
@@ -85,7 +85,8 @@ FishForInterestingExamples := function()
     S := (RandomSemigroup(IsTransformationSemigroup,2,13));
     partition :=StateSetCongruence(Generators(S), [[1,2],[3,4]]);
     if (5 <= Size(Filtered(partition, A -> Size(A) > 1))) then
-      Print("S := Semigroup(",Generators(S), ");\n", partition, "\n");
+      Print("S := Semigroup(",Generators(S), ");\n", Size(S), " ",partition, "\n");
+      DisplayHolonomyComponents(Skeleton(S));
     fi;
   od;
 end;

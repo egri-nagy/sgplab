@@ -5,8 +5,8 @@ S := Semigroup([Transformation([13,5,2,2,11,1,10,7,6,1,3,11,11]),
 #partition
 partition := StateSetCongruence(Generators(S), [[1,2], [3,4]]);
 
-theta := ThetaFromCongruence(partition);
-phi := PhiFromCongruence(partition, S);
+theta := ThetaForCongruence(partition);
+phi := PhiForCongruence(partition, S);
 
 IsTSRelMorph(theta, phi, OnPoints, OnPoints);
 
