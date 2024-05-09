@@ -205,8 +205,8 @@ MuLift := function(s,t,theta,n)
       Add(deps, [[y], nt]);
     fi;
   od;#y
-  return Cascade([n,k],
-                 Concatenation([[[], t]], deps));
+  if not IsOne(t) then Add(deps, [[],t]); fi; #top level is t
+  return Cascade([n,k], deps, TransCascadeType);
 end;
 
 # needed for MuCheck
