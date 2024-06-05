@@ -79,6 +79,13 @@ PhiForCongruence := function(partition, S)
   return HashMap(List(S, s ->[s, [congact(s)]]));
 end;
 
+#### Experimental stuff ########################################################
+# returns all pair-generated congruences of the given ts
+PairGenerated := function(S) #
+  return Set(List(Combinations([1..DegreeOfTransformationCollection(S)],2),
+           pair -> StateSetCongruence(Generators(S), [pair])));
+end;
+
 FishForInterestingExamples := function()
   local S, partition;
   while (true) do
