@@ -15,7 +15,7 @@ ElementwiseProduct := function(A, B, binop)
                     p -> binop(p[1],p[2])));
 end;
 
-# Checking compatible actions for a trasnformation semigroup relational
+# Checking compatible actions for a transformation semigroup relational
 # morphism from (X,S) to (Y,T).
 # Aborts immediately and reports first incompatibility.
 # theta: for states, hashmap from X to subsets of Y
@@ -60,7 +60,7 @@ IsSgpRelMorph := function(phi, Smul, Tmul)
   return true;
 end;
 
-### CREATING A SURJECTIVE MORPHISM, constructing theta and phi #################
+### CREATING SURJECTIVE MORPHISMS, constructing theta and phi #################
 
 # STATES: subsets of the state set missing one point
 # creates a relation on states for the full transformation semigroup
@@ -72,7 +72,6 @@ ThetaForPermutationResets := function(n) #we only need the number of states, the
 end;
 
 # TRANSFORMATIONS: permutations or constant maps
-
 # deciding whether a transformation is actually a permutation
 # note: IsPerm is about the type of the object, not what it is doing
 IsPermutation := function(t)
@@ -162,6 +161,7 @@ PsiInvFunc := function(coords,thetainv)
   return winv(z);
 end;
 
+# checking to coordinatized states by mapping them back to X
 PsiCheck := function(theta)
   local x, thetainv;
   thetainv := InvertHashMapRelation(theta);
@@ -173,6 +173,7 @@ PsiCheck := function(theta)
   od;
   return true;
 end;
+
 # TRANSFORMATIONS
 # given the context y, the top level state, we want to know
 # how the original action of s can be expressed locally on Z
