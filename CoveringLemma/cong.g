@@ -1,5 +1,7 @@
 ### creating congruences on X for (X,S) for a surjective homomorphism
 # the algorithm is similar to the classical DFA minimization
+# TODO: GAP library has Partition although it is undocumented - check whether it is usable here or not
+
 
 # Gives classes to be merged if needed, if everything checks, then it returns
 # the empty list. Going through all classes and generators gens, but immediately
@@ -84,6 +86,23 @@ end;
 PairGenerated := function(S) #
   return Set(List(Combinations([1..DegreeOfTransformationCollection(S)],2),
            pair -> StateSetCongruence(Generators(S), [pair])));
+end;
+
+# returns true if alpha is a finer partition than beta
+IsFinerPartition := function(alpha, beta)
+  return ForAll(alpha, A -> ForAny(beta, B -> IsSubset(B,A)));
+end;
+
+IsStrictlyFinerPartition := function(alpha, beta)
+  return (alpha <> beta) and IsFinerPartition(alpha, beta);
+end;
+
+Atoms := function(S)
+  local congs;
+  congs := PairGenerated(S);
+  return Filtered(congs,
+                  alpha -> not (ForAny(congs,
+                                       beta -> IsStrictlyFinerPartition(beta, alpha))));
 end;
 
 FishForInterestingExamples := function()
