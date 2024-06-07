@@ -37,6 +37,14 @@ ReverseLookup := function(partition)
                                                  x -> [x, eqcl]))));
 end;
 
+# completes a set of disjoint sets into a partition of [1..n]
+# by adding singleton sets for the missing states
+CompletePartition := function(disjoint_sets, n)
+  return Set(Concatenation(disjoint_sets,
+                           List(Difference([1..n], Union(disjoint_sets)),
+                                x->[x])));
+end;
+
 ### THE MAIN FUNCTION TO CALL
 # Returns the coarsest congruence, in which the given seed sets are inside
 # equivalence classes.
@@ -45,8 +53,7 @@ end;
 StateSetCongruence := function(gens, seeds)
   local n, partition, m, collapsible;
   n := DegreeOfTransformationCollection(gens);
-  partition := Concatenation(seeds, List(Difference([1..n], Union(seeds)), x->[x]));
-  Perform(partition, Sort); #ugly but ok
+  partition := CompletePartition(seeds,n);
   repeat
     m := ReverseLookup(partition);
     collapsible := ClassesToBeMerged(partition, m, gens);
