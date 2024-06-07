@@ -24,6 +24,7 @@ end;
 # given a partition and classes to be merged, it returns a new partiton
 # with merged classes
 # removes the ones to be merged and adds their union
+# Both Difference and Union return new lists, thus the partition is new.
 # DANGER we assume the classes are ordered, but Union silently applies Set
 MergeClasses := function(partition, tomerge)
   return Concatenation(Difference(partition, tomerge),
@@ -63,6 +64,27 @@ StateSetCongruence := function(gens, seeds)
   until IsEmpty(collapsible);
   #to guarantee that it is sorted
   return AsSortedList(List(partition, eqcl -> AsSortedList(eqcl)));
+end;
+
+AllStateSetCongruences := function(gens)
+  local n, alpha, beta, congs, waiting, seeds, ncong;
+  n := DegreeOfTransformationCollection(gens);
+  alpha := CompletePartition([],n);
+  congs := HashSet();
+  AddSet(congs, alpha);
+  waiting := Stack();
+  Push(waiting, alpha);
+  while Size(waiting) > 0 do
+    beta := Pop(waiting);
+    for  seeds in IteratorOfCombinations(beta,2) do
+      ncong := StateSetCongruence(gens,MergeClasses(beta, seeds));
+      if not (ncong in congs) then
+        AddSet(congs, ncong);
+        Push(waiting, ncong);
+      fi;
+    od;
+  od;
+  return congs;
 end;
 
 #### now the Covering Lemma stuff #####################################################
