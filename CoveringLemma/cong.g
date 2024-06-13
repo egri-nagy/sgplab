@@ -112,6 +112,10 @@ end;
 
 #### Experimental stuff ########################################################
 # returns all pair-generated congruences of the given ts
+StateSetCongruenceMeet := function(alpha, beta,n)
+  return CompletePartition(Intersection([alpha,beta]),n);
+end;
+
 PairGenerated := function(S) #
   return Set(List(Combinations([1..DegreeOfTransformationCollection(S)],2),
            pair -> StateSetCongruence(Generators(S), [pair])));
