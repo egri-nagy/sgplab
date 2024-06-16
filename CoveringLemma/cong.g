@@ -8,8 +8,9 @@
 # returning the first found classes to be merged.
 # eqcls - the equivalence classes so far
 # lookup takes a point to its current equivalence class
-ClassesToBeMerged := function(eqcls, lookup, gens)
-  local g, eqcl, result;
+ClassesToBeMerged := function(eqcls, gens)
+  local g, eqcl, result, lookup;
+  lookup := ReverseLookup(eqcls);
   for g in gens do
     for eqcl in eqcls do
       result := AsSet(List(eqcl, x -> lookup[OnPoints(x,g)]));
@@ -52,11 +53,10 @@ end;
 # seeds: disjoint sets of states
 # gens: transformations, typically generators of the ts
 StateSetCongruence := function(gens, seeds)
-  local n, partition, m, collapsible;
+  local n, partition, collapsible;
   n := DegreeOfTransformationCollection(gens);
   partition := CompletePartition(seeds,n);
   repeat
-    m := ReverseLookup(partition);
     collapsible := ClassesToBeMerged(partition, m, gens);
     if not(IsEmpty(collapsible)) then
       partition := MergeClasses(partition, collapsible);
