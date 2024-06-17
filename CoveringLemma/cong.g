@@ -19,29 +19,6 @@ AllStateSetCongruences := function(gens)
   return congs;
 end;
 
-#### now the Covering Lemma stuff #####################################################
-ThetaForCongruence := function(partition)
-  local rl, pairs;
-  rl := ReverseLookup(partition);
-  pairs := List(partition, #go through all equivalence classes
-                eqcl -> List(eqcl, #for all points we map them to their eqclass index
-                             x -> [x, [Position(partition, rl[x])]]));
-  return HashMap(Concatenation(pairs));
-end;
-
-# S - set of transformations, not necessarily a semigroup
-PhiForCongruence := function(partition, S)
-  local rl, congact;
-  rl := ReverseLookup(partition);
-  congact := function(s)
-    return Transformation(List(partition,
-                               eqcl ->
-                                    Position(partition,
-                                             rl[First(OnSets(eqcl,s))])));
-  end;
-  return HashMap(List(S, s ->[s, [congact(s)]]));
-end;
-
 #### Experimental stuff ########################################################
 # returns all pair-generated congruences of the given ts
 StateSetCongruenceMeet := function(alpha, beta,n)
