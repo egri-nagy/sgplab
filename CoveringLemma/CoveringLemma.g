@@ -1,9 +1,5 @@
 # Implementing the Covering Lemma as described in https://arxiv.org/abs/2404.11923
 
-Read("hashmap.g");
-
-### RELATIONAL MORPHISMS #######################################################
-
 
 #WIP
 #it is a rare property - mostly just the identity or constant maps
@@ -30,8 +26,8 @@ Uy := function(theta, phi, y)
   local wy, wyinv, thetainv,k;
   thetainv := InvertHashMapRelation(theta);
   k := Size(thetainv[y]);
-  wy := W(thetainv[y]);
-  wyinv := Winv(thetainv[y]);
+  wy := wyLabel(thetainv[y]);
+  wyinv := wyLabelInv(thetainv[y]);
   return AsSet(List(Staby(phi,y), s -> List([1..k],
                                   i -> wy(OnPoints(wyinv(i),s)))));
 end;
