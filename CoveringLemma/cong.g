@@ -3,6 +3,10 @@ StateSetCongruenceMeet := function(alpha, beta,n)
   return CompletePartition(Intersection([alpha,beta]),n);
 end;
 
+IsClosedStateSetCongruence := function(alpha, gens, n)
+  return AsSet(CompletePartition(alpha,n)) = AsSet(StateSetCongruence(gens,alpha));
+end;
+
 FindNonMeet := function(N)
   local S,alpha, beta, m;
   repeat
@@ -14,10 +18,6 @@ FindNonMeet := function(N)
     Print("#\c");
   until not (IsClosedStateSetCongruence(m, Generators(S),N));
   return S;
-end;
-
-IsClosedStateSetCongruence := function(alpha, gens, n)
-  return AsSet(CompletePartition(alpha,n)) = AsSet(StateSetCongruence(gens,alpha));
 end;
 
 StateSetCongruenceJoin := function(alpha, beta)
